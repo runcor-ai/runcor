@@ -1,0 +1,11 @@
+providers:
+  - apiKey: test-key
+    priority: 1
+
+connections:
+  - transport: sse
+
+costs:
+  budgets:
+    global:
+      enforcement: hard

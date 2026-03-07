@@ -1,0 +1,70 @@
+engine:
+  concurrency: 50
+  drainTimeout: 5000
+  retentionPeriod: 7200
+
+providers:
+  - type: mock
+    priority: 1
+    models:
+      - mock-v1
+    costPerToken:
+      input: 0.001
+      output: 0.002
+
+routing:
+  strategy: priority
+  maxFallbackAttempts: 3
+  failureThreshold: 5
+  cooldownMs: 30000
+
+connections:
+  - name: test-sse
+    transport: sse
+    url: http://localhost:3000
+    timeoutMs: 5000
+
+costs:
+  warningThreshold: 0.8
+  defaultTokenEstimate: 500
+  maxLedgerEntries: 10000
+  budgets:
+    perRequest:
+      limit: 1.0
+      enforcement: hard
+    global:
+      limit: 100.0
+      enforcement: soft
+      window:
+        type: daily
+
+telemetry:
+  serviceName: runcor-test
+  serviceVersion: "1.0.0"
+  memorySpans: true
+
+policy:
+  rateLimits:
+    - name: global-limit
+      scope: global
+      limit: 1000
+      windowMs: 60000
+  accessPolicies:
+    - identity: admin
+      allowedOperations:
+        - trigger
+        - resume
+  tenants:
+    - tenantId: tenant-1
+      allowedFlows:
+        - greeting
+
+evaluation:
+  autoFlagScoreThreshold: 0.3
+  evaluators:
+    - type: length
+      name: length-check
+      weight: 1.0
+      config:
+        minLength: 10
+        maxLength: 1000

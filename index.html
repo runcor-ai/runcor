@@ -1,0 +1,1580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>runcor Documentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg-primary:#09090b;--bg-secondary:#0f0f12;--bg-tertiary:#17171c;--bg-card:#131318;
+--border:#1e1e26;--border-hover:#2a2a36;
+--text-primary:#ededef;--text-secondary:#8b8b96;--text-tertiary:#5a5a66;
+--accent:#3b82f6;--accent-dim:#2563eb;--accent-glow:rgba(59,130,246,0.15);
+--accent-warm:#f59e0b;--accent-green:#22c55e;
+--sidebar-w:280px;--topnav-h:60px;
+}
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--topnav-h) + 24px)}
+body{font-family:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif;background:var(--bg-primary);color:var(--text-primary);line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none;transition:color .2s}
+a:hover{color:#60a5fa}
+
+/* Top Nav */
+.topnav{position:fixed;top:0;left:0;right:0;height:var(--topnav-h);background:rgba(9,9,11,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:100}
+.topnav-logo{font-size:1.2rem;font-weight:800;color:var(--text-primary);letter-spacing:-0.03em}
+.topnav-logo span{color:var(--accent)}
+.topnav-links{display:flex;align-items:center;gap:20px}
+.topnav-links a{color:var(--text-secondary);font-size:.875rem;font-weight:500;transition:color .2s}
+.topnav-links a:hover{color:var(--text-primary)}
+.hamburger{display:none;background:none;border:none;cursor:pointer;padding:4px}
+.hamburger svg{width:24px;height:24px;stroke:var(--text-secondary)}
+
+/* Sidebar */
+.sidebar{position:fixed;top:var(--topnav-h);left:0;width:var(--sidebar-w);height:calc(100vh - var(--topnav-h));background:var(--bg-secondary);border-right:1px solid var(--border);overflow-y:auto;padding:24px 0;z-index:90;transition:transform .3s ease}
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border-hover);border-radius:2px}
+.sidebar-title{font-size:.7rem;font-weight:700;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.08em;padding:0 20px;margin-bottom:8px}
+.sidebar a{display:block;padding:6px 20px;font-size:.85rem;color:var(--text-secondary);transition:all .15s;border-left:2px solid transparent}
+.sidebar a:hover{color:var(--text-primary);background:var(--bg-tertiary)}
+.sidebar a.active{color:var(--accent);border-left-color:var(--accent);background:var(--accent-glow)}
+
+/* Main */
+.main{margin-left:var(--sidebar-w);margin-top:var(--topnav-h);padding:48px 48px 120px;max-width:calc(800px + 96px + var(--sidebar-w));min-height:100vh}
+.content{max-width:800px}
+
+/* Typography */
+h1{font-size:clamp(2.4rem,5vw,3.6rem);font-weight:800;letter-spacing:-0.03em;line-height:1.15;margin-bottom:12px}
+h2{font-size:clamp(1.8rem,3.5vw,2.4rem);font-weight:700;letter-spacing:-0.02em;margin-top:64px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+h3{font-size:1.3rem;font-weight:600;margin-top:36px;margin-bottom:12px}
+p{margin-bottom:16px;color:var(--text-secondary);line-height:1.7}
+.subtitle{font-size:1.15rem;color:var(--text-tertiary);margin-bottom:48px}
+hr{border:none;border-top:1px solid var(--border);margin:48px 0}
+strong{color:var(--text-primary);font-weight:600}
+
+/* Lists */
+ul,ol{margin-bottom:16px;padding-left:24px;color:var(--text-secondary)}
+li{margin-bottom:6px;line-height:1.7}
+li strong{color:var(--text-primary)}
+
+/* Code */
+code{font-family:'JetBrains Mono',monospace;font-size:.85em;background:var(--bg-secondary);color:#c084fc;padding:2px 6px;border-radius:4px;border:1px solid var(--border)}
+pre{background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin-bottom:20px;overflow-x:auto;position:relative}
+pre code{background:none;border:none;padding:0;font-size:13.5px;line-height:1.7;color:var(--text-primary)}
+.lang-label{position:absolute;top:8px;right:12px;font-size:11px;color:var(--text-tertiary);font-family:'JetBrains Mono',monospace;text-transform:lowercase}
+
+/* Syntax colors */
+.kw{color:#c084fc}
+.fn{color:#60a5fa}
+.str{color:#34d399}
+.cm{color:var(--text-tertiary);font-style:italic}
+.nu{color:var(--accent-warm)}
+.ty{color:#f472b6}
+.op{color:var(--text-secondary)}
+
+/* Tables */
+.table-wrap{overflow-x:auto;margin-bottom:20px;border-radius:10px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;background:var(--bg-card);font-size:.9rem}
+thead{background:var(--bg-tertiary)}
+th{padding:.75rem 1rem;text-align:left;font-weight:600;color:var(--text-primary);border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:.75rem 1rem;color:var(--text-secondary);border-bottom:1px solid var(--border)}
+tr:last-child td{border-bottom:none}
+
+/* Back to top */
+.btt{position:fixed;bottom:32px;right:32px;width:44px;height:44px;background:var(--bg-tertiary);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;visibility:hidden;transition:all .3s;z-index:80}
+.btt.visible{opacity:1;visibility:visible}
+.btt:hover{background:var(--accent-dim);border-color:var(--accent)}
+.btt svg{width:20px;height:20px;stroke:var(--text-secondary)}
+.btt:hover svg{stroke:#fff}
+
+/* ASCII diagram blocks */
+pre.diagram{background:var(--bg-card);border-color:var(--border-hover)}
+pre.diagram code{color:var(--text-secondary);font-size:13px}
+
+/* Mobile */
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-overlay{display:none;position:fixed;top:var(--topnav-h);left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:85}
+  .sidebar-overlay.open{display:block}
+  .main{margin-left:0;padding:32px 20px 100px}
+  .hamburger{display:block}
+  h1{font-size:2rem}
+  h2{font-size:1.6rem;margin-top:48px}
+}
+@media(max-width:600px){
+  .main{padding:24px 16px 80px}
+  pre{padding:1rem;font-size:12.5px}
+  th,td{padding:.5rem .65rem;font-size:.82rem}
+}
+</style>
+</head>
+<body>
+
+<!-- Top Nav -->
+<nav class="topnav">
+  <div style="display:flex;align-items:center;gap:16px">
+    <button class="hamburger" onclick="toggleSidebar()" aria-label="Toggle menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <a href="https://runcor.ai" class="topnav-logo">runcor<span>.</span></a>
+  </div>
+  <div class="topnav-links">
+    <a href="https://runcor.ai">Home</a>
+    <a href="https://github.com/runcor-ai/runcor">GitHub</a>
+  </div>
+</nav>
+
+<!-- Sidebar Overlay (mobile) -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-title">Documentation</div>
+  <a href="#overview">Overview</a>
+  <a href="#getting-started">Getting Started</a>
+  <a href="#core-concepts">Core Concepts</a>
+  <a href="#engine-api">Engine API</a>
+  <a href="#flow-handlers">Flow Handlers</a>
+  <a href="#model-routing">Model Routing</a>
+  <a href="#cost-tracking">Cost Tracking</a>
+  <a href="#scoped-memory">Scoped Memory</a>
+  <a href="#wait--resume--replay">Wait / Resume / Replay</a>
+  <a href="#agent-execution">Agent Execution</a>
+  <a href="#structured-output">Structured Output</a>
+  <a href="#policy--guardrails">Policy &amp; Guardrails</a>
+  <a href="#evaluation--quality">Evaluation &amp; Quality</a>
+  <a href="#mcp-adapters">MCP Adapters</a>
+  <a href="#mcp-server">MCP Server</a>
+  <a href="#scheduled-flows">Scheduled Flows</a>
+  <a href="#discernment">Discernment</a>
+  <a href="#http-server">HTTP Server</a>
+  <a href="#cli">CLI</a>
+  <a href="#sqlite-persistence">SQLite Persistence</a>
+  <a href="#observability">Observability</a>
+  <a href="#dashboard">Dashboard</a>
+  <a href="#configuration-reference">Configuration Reference</a>
+  <a href="#error-handling">Error Handling</a>
+  <a href="#testing-with-mockprovider">Testing with MockProvider</a>
+  <a href="#project-structure">Project Structure</a>
+  <a href="#requirements">Requirements</a>
+  <a href="#license">License</a>
+</aside>
+
+<!-- Back to Top -->
+<button class="btt" id="btt" onclick="window.scrollTo({top:0})" aria-label="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<!-- Main Content -->
+<main class="main">
+<div class="content">
+
+<!-- TITLE -->
+<h1 id="top">runcor Documentation</h1>
+<p class="subtitle">Complete reference for the runcor AI runtime engine.</p>
+
+<!-- ============================================================ -->
+<!-- OVERVIEW -->
+<!-- ============================================================ -->
+<h2 id="overview">Overview</h2>
+
+<p>runcor is a runtime engine that sits between your application and foundation models. It handles model routing, retries, memory, cost tracking, policy enforcement, quality evaluation, external system connections, and business value analysis &mdash; so your code stays focused on business logic.</p>
+
+<pre class="diagram"><code>Your AI Tools          (thin — just workflow logic)
+       |
+     runcor             (routing, memory, cost, policy, agents, eval, scheduling, telemetry)
+       |
+Foundation Models      (Anthropic, OpenAI, Google)
+External Systems       (Gmail, Slack, databases, APIs)</code></pre>
+
+<h3>What runcor provides</h3>
+<ul>
+<li><strong>Model routing</strong> with fallbacks and circuit breakers across Anthropic, OpenAI, and Google</li>
+<li><strong>Durable execution</strong> with a managed state machine, concurrency control, and graceful shutdown</li>
+<li><strong>Cost tracking</strong> with per-request, per-user, per-flow, and global budgets</li>
+<li><strong>Scoped memory</strong> (tool, user, session) with pluggable backends</li>
+<li><strong>Policy enforcement</strong> with rules, guardrails, rate limiting, and access control</li>
+<li><strong>Agent execution</strong> with tool calling, iteration budgets, and stop conditions</li>
+<li><strong>Scheduled flows</strong> with cron triggers and timezone support</li>
+<li><strong>Quality evaluation</strong> with scoring, confidence levels, and human review flags</li>
+<li><strong>External connections</strong> via MCP adapters (Gmail, Slack, Calendar, custom)</li>
+<li><strong>Discernment analysis</strong> that tells you whether your AI workflows deliver business value</li>
+<li><strong>OpenTelemetry</strong> native traces, metrics, and structured logs</li>
+<li><strong>HTTP API</strong> with 16 REST endpoints and SSE event streaming</li>
+<li><strong>CLI</strong> for project scaffolding and runtime management</li>
+<li><strong>Built-in dashboard</strong> for monitoring executions, costs, and provider health</li>
+</ul>
+
+<!-- ============================================================ -->
+<!-- GETTING STARTED -->
+<!-- ============================================================ -->
+<h2 id="getting-started">Getting Started</h2>
+
+<h3>Installation</h3>
+<pre><span class="lang-label">bash</span><code><span class="fn">npm</span> install runcor</code></pre>
+
+<h3>Minimal example</h3>
+<pre><span class="lang-label">typescript</span><code><span class="kw">import</span> { createEngine } <span class="kw">from</span> <span class="str">'runcor'</span>;
+
+<span class="kw">const</span> engine = <span class="kw">await</span> <span class="fn">createEngine</span>();
+
+engine.<span class="fn">register</span>(<span class="str">'hello'</span>, <span class="kw">async</span> (ctx) => {
+  <span class="kw">const</span> response = <span class="kw">await</span> ctx.model.<span class="fn">complete</span>({
+    prompt: <span class="str">'Say hello in one sentence.'</span>,
+  });
+  <span class="kw">return</span> response.text;
+});
+
+<span class="kw">const</span> exec = <span class="kw">await</span> engine.<span class="fn">trigger</span>(<span class="str">'hello'</span>, {
+  idempotencyKey: <span class="str">'hello-001'</span>,
+});</code></pre>
+
+<h3>With configuration</h3>
+<p>Create a <code>runcor.yaml</code> in your project root:</p>
+<pre><span class="lang-label">yaml</span><code><span class="kw">providers</span>:
+  - <span class="kw">type</span>: <span class="str">anthropic</span>
+    <span class="kw">apiKey</span>: <span class="str">${ANTHROPIC_API_KEY}</span>
+    <span class="kw">models</span>: [<span class="str">claude-sonnet-4-20250514</span>]</code></pre>
+
+<pre><span class="lang-label">typescript</span><code><span class="kw">import</span> { createEngine } <span class="kw">from</span> <span class="str">'runcor'</span>;
+
+<span class="kw">const</span> engine = <span class="kw">await</span> <span class="fn">createEngine</span>(); <span class="cm">// auto-loads runcor.yaml</span>
+
+engine.<span class="fn">register</span>(<span class="str">'morning-brief'</span>, <span class="kw">async</span> (ctx) => {
+  <span class="kw">const</span> brief = <span class="kw">await</span> ctx.model.<span class="fn">complete</span>({
+    prompt: <span class="str">'Summarize today\'s priorities.'</span>,
+  });
+  <span class="kw">await</span> ctx.memory.user.<span class="fn">set</span>(<span class="str">'last-brief'</span>, brief.text);
+  <span class="kw">return</span> brief.text;
+});
+
+<span class="kw">await</span> engine.<span class="fn">trigger</span>(<span class="str">'morning-brief'</span>, {
+  idempotencyKey: <span class="str">'brief-2026-03-07'</span>,
+  userId: <span class="str">'alice'</span>,
+});</code></pre>
+
+<!-- ============================================================ -->
+<!-- CORE CONCEPTS -->
+<!-- ============================================================ -->
+<h2 id="core-concepts">Core Concepts</h2>
+
+<h3>Executions</h3>
+<p>Every flow trigger creates an <strong>execution</strong> that moves through a state machine:</p>
+<pre class="diagram"><code>queued → running → complete
+                 → failed
+         running → waiting → running (resumed)
+         running → retrying → running
+queued/running/waiting → failed (via cancel)</code></pre>
+
+<p>Each execution has:</p>
+<ul>
+<li>A unique ID</li>
+<li>An idempotency key (prevents duplicate triggers)</li>
+<li>State transition timestamps</li>
+<li>Input, result, and error data</li>
+<li>Optional userId, sessionId, and tenantId</li>
+</ul>
+
+<h3>Concurrency control</h3>
+<p>The engine limits how many executions run simultaneously. Excess triggers are queued in FIFO order and dispatched as slots open.</p>
+<pre><span class="lang-label">typescript</span><code><span class="kw">const</span> engine = <span class="kw">await</span> <span class="fn">createEngine</span>({
+  concurrency: <span class="nu">10</span>,      <span class="cm">// max 10 running at once (default: 100)</span>
+  drainTimeout: <span class="nu">15000</span>,  <span class="cm">// wait 15s for in-flight work on shutdown</span>
+});</code></pre>
+
+<h3>Idempotency</h3>
+<p>Every trigger requires an <code>idempotencyKey</code>. If you trigger the same key twice, the second call returns the existing execution instead of creating a duplicate.</p>
+<pre><span class="lang-label">typescript</span><code><span class="cm">// First call creates the execution</span>
+<span class="kw">await</span> engine.<span class="fn">trigger</span>(<span class="str">'my-flow'</span>, { idempotencyKey: <span class="str">'order-123'</span> });
+
+<span class="cm">// Second call returns the same execution</span>
+<span class="kw">await</span> engine.<span class="fn">trigger</span>(<span class="str">'my-flow'</span>, { idempotencyKey: <span class="str">'order-123'</span> });</code></pre>
+
+<!-- ============================================================ -->
+<!-- ENGINE API -->
+<!-- ============================================================ -->
+<h2 id="engine-api">Engine API</h2>
+
+<h3>Creating an engine</h3>
+<pre><span class="lang-label">typescript</span><code><span class="kw">import</span> { createEngine } <span class="kw">from</span> <span class="str">'runcor'</span>;
+
+<span class="cm">// Minimal (in-memory, no providers)</span>
+<span class="kw">const</span> engine = <span class="kw">await</span> <span class="fn">createEngine</span>();
+
+<span class="cm">// With config object</span>
+<span class="kw">const</span> engine = <span class="kw">await</span> <span class="fn">createEngine</span>({
+  model: { providers: [{ provider: myProvider, priority: <span class="nu">1</span> }] },
+  concurrency: <span class="nu">50</span>,
+  drainTimeout: <span class="nu">10000</span>,
+});
+
+<span class="cm">// From runcor.yaml (auto-detected)</span>
+<span class="kw">const</span> engine = <span class="kw">await</span> <span class="fn">createEngine</span>();</code></pre>
+
+<h3>Flow management</h3>
+<pre><span class="lang-label">typescript</span><code><span class="cm">// Register a flow</span>
+engine.<span class="fn">register</span>(<span class="str">'my-flow'</span>, handler, {
+  timeout: <span class="nu">60000</span>,         <span class="cm">// 60s max execution time</span>
+  maxRetries: <span class="nu">3</span>,          <span class="cm">// retry on transient failures</span>
+  description: <span class="str">'Does X'</span>,  <span class="cm">// shown in MCP server and HTTP API</span>
+  inputSchema: { ... },   <span class="cm">// JSON Schema for input validation</span>
+});
+
+<span class="cm">// Unregister</span>
+engine.<span class="fn">unregister</span>(<span class="str">'my-flow'</span>);
+
+<span class="cm">// List registered flows</span>
+<span class="kw">const</span> flows = engine.<span class="fn">listFlows</span>();
+<span class="cm">// [{ name: 'my-flow', config: { timeout: 60000, ... } }]</span></code></pre>
+
+<h3>Execution control</h3>
+<pre><span class="lang-label">typescript</span><code><span class="cm">// Trigger</span>
+<span class="kw">const</span> exec = <span class="kw">await</span> engine.<span class="fn">trigger</span>(<span class="str">'my-flow'</span>, {
+  idempotencyKey: <span class="str">'unique-key'</span>,
+  input: { data: <span class="str">'value'</span> },
+  userId: <span class="str">'alice'</span>,
+  sessionId: <span class="str">'session-1'</span>,
+  tenantId: <span class="str">'tenant-a'</span>,
+  metadata: { source: <span class="str">'api'</span> },
+});
+
+<span class="cm">// Get execution status</span>
+<span class="kw">const</span> status = <span class="kw">await</span> engine.<span class="fn">getExecution</span>(exec.id);
+
+<span class="cm">// List executions</span>
+<span class="kw">const</span> all = <span class="kw">await</span> engine.<span class="fn">list</span>();
+<span class="kw">const</span> running = <span class="kw">await</span> engine.<span class="fn">list</span>({ state: <span class="str">'running'</span> });
+<span class="kw">const</span> byFlow = <span class="kw">await</span> engine.<span class="fn">list</span>({ flowName: <span class="str">'my-flow'</span> });
+
+<span class="cm">// Cancel</span>
+<span class="kw">await</span> engine.<span class="fn">cancel</span>(exec.id, <span class="str">'No longer needed'</span>);
+
+<span class="cm">// Resume a waiting execution</span>
+<span class="kw">await</span> engine.<span class="fn">resume</span>(exec.id, { approved: <span class="kw">true</span> });
+
+<span class="cm">// Replay a completed execution</span>
+<span class="kw">const</span> replay = <span class="kw">await</span> engine.<span class="fn">replay</span>(exec.id);
+
+<span class="cm">// Delete a terminal execution</span>
+<span class="kw">await</span> engine.<span class="fn">deleteExecution</span>(exec.id);
+
+<span class="cm">// List waiting executions</span>
+<span class="kw">const</span> waiting = <span class="kw">await</span> engine.<span class="fn">listWaiting</span>(<span class="str">'my-flow'</span>, { userId: <span class="str">'alice'</span> });</code></pre>
+
+<h3>Events</h3>
+<p>The engine extends <code>EventEmitter</code>. Subscribe to lifecycle events:</p>
+<pre><span class="lang-label">typescript</span><code>engine.<span class="fn">on</span>(<span class="str">'execution:state_change'</span>, (event) => {
+  console.<span class="fn">log</span>(<span class="str">`${event.executionId}: ${event.from} → ${event.to}`</span>);
+});
+
+engine.<span class="fn">on</span>(<span class="str">'execution:complete'</span>, (event) => {
+  console.<span class="fn">log</span>(<span class="str">`Done: ${event.result}`</span>);
+});
+
+engine.<span class="fn">on</span>(<span class="str">'cost:budget_exceeded'</span>, (event) => {
+  console.<span class="fn">log</span>(<span class="str">`Budget exceeded: ${event.scope}`</span>);
+});</code></pre>
+
+<p><strong>Available events:</strong></p>
+<div class="table-wrap"><table>
+<thead><tr><th>Event</th><th>Payload</th></tr></thead>
+<tbody>
+<tr><td><code>ready</code></td><td><code>{}</code></td></tr>
+<tr><td><code>shutdown</code></td><td><code>{}</code></td></tr>
+<tr><td><code>execution:state_change</code></td><td><code>{ executionId, from, to }</code></td></tr>
+<tr><td><code>execution:complete</code></td><td><code>{ executionId, result }</code></td></tr>
+<tr><td><code>provider:health_change</code></td><td><code>{ provider, state }</code></td></tr>
+<tr><td><code>cost:request</code></td><td><code>{ executionId, provider, model, cost, tokens }</code></td></tr>
+<tr><td><code>cost:budget_warning</code></td><td><code>{ scope, current, limit }</code></td></tr>
+<tr><td><code>cost:budget_exceeded</code></td><td><code>{ scope, current, limit }</code></td></tr>
+<tr><td><code>policy:violation</code></td><td><code>{ rule, flowName, reason }</code></td></tr>
+<tr><td><code>policy:warning</code></td><td><code>{ guardrail, flowName, reason }</code></td></tr>
+<tr><td><code>policy:rate_limited</code></td><td><code>{ name, scope }</code></td></tr>
+<tr><td><code>eval:score</code></td><td><code>{ executionId, evaluator, scores }</code></td></tr>
+<tr><td><code>eval:complete</code></td><td><code>{ executionId, overallScore, confidence }</code></td></tr>
+<tr><td><code>eval:flagged</code></td><td><code>{ executionId, reason }</code></td></tr>
+<tr><td><code>adapter:connected</code></td><td><code>{ name }</code></td></tr>
+<tr><td><code>adapter:disconnected</code></td><td><code>{ name }</code></td></tr>
+<tr><td><code>adapter:error</code></td><td><code>{ name, error }</code></td></tr>
+<tr><td><code>adapter:tools_discovered</code></td><td><code>{ name, tools }</code></td></tr>
+<tr><td><code>adapter:tool_call</code></td><td><code>{ adapter, tool, result }</code></td></tr>
+<tr><td><code>flow:registered</code></td><td><code>{ name }</code></td></tr>
+<tr><td><code>flow:unregistered</code></td><td><code>{ name }</code></td></tr>
+<tr><td><code>scheduler:trigger</code></td><td><code>{ flowName }</code></td></tr>
+<tr><td><code>scheduler:skip</code></td><td><code>{ flowName, reason }</code></td></tr>
+<tr><td><code>scheduler:registered</code></td><td><code>{ flowName, cron }</code></td></tr>
+<tr><td><code>scheduler:removed</code></td><td><code>{ flowName }</code></td></tr>
+<tr><td><code>model:validation_retry</code></td><td><code>{ executionId, error }</code></td></tr>
+<tr><td><code>discernment:signal</code></td><td><code>{ signal }</code></td></tr>
+<tr><td><code>discernment:recommendation</code></td><td><code>{ recommendation }</code></td></tr>
+<tr><td><code>discernment:cycle</code></td><td><code>{ report }</code></td></tr>
+</tbody>
+</table></div>
+
+<h3>Shutdown</h3>
+<pre><span class="lang-label">typescript</span><code><span class="kw">await</span> engine.<span class="fn">shutdown</span>(); <span class="cm">// waits for drainTimeout, then force-fails stragglers</span></code></pre>
+
+<h3>Status and capabilities</h3>
+<pre><span class="lang-label">typescript</span><code>engine.<span class="fn">getStatus</span>();
+<span class="cm">// 'initializing' | 'ready' | 'shutting_down' | 'stopped'</span>
+
+engine.<span class="fn">getCapabilities</span>();
+<span class="cm">// { cost: true, evaluation: true, adapters: false, discernment: true, scheduler: true }</span>
+
+engine.<span class="fn">getProviderHealth</span>();
+<span class="cm">// [{ name: 'anthropic', healthState: 'healthy', priority: 1, costPerToken: { ... } }]</span></code></pre>
+
+<!-- ============================================================ -->
+<!-- FLOW HANDLERS -->
+<!-- ============================================================ -->
+<h2 id="flow-handlers">Flow Handlers</h2>
+
+<p>A flow handler is an async function that receives an <code>ExecutionContext</code>:</p>
+<pre><span class="lang-label">typescript</span><code><span class="kw">async function</span> <span class="fn">myHandler</span>(ctx: <span class="ty">ExecutionContext</span>): <span class="ty">Promise</span>&lt;<span class="ty">unknown</span>&gt; {
+  <span class="cm">// ctx.executionId   — unique execution ID</span>
+  <span class="cm">// ctx.input         — data passed via trigger</span>
+  <span class="cm">// ctx.model         — model completion API</span>
+  <span class="cm">// ctx.memory        — scoped memory (tool, user, session)</span>
+  <span class="cm">// ctx.cost          — cost tracking for this execution</span>
+  <span class="cm">// ctx.telemetry     — OpenTelemetry integration</span>
+  <span class="cm">// ctx.tools         — MCP adapter tools (if configured)</span>
+  <span class="cm">// ctx.resumeData    — data from resume() (if resumed from waiting)</span>
+
+  <span class="kw">const</span> result = <span class="kw">await</span> ctx.model.<span class="fn">complete</span>({ prompt: <span class="str">'Hello'</span> });
+  <span class="kw">return</span> result.text;
+}
+
+engine.<span class="fn">register</span>(<span class="str">'my-flow'</span>, myHandler);</code></pre>
+
+<h3>Flow configuration</h3>
+<pre><span class="lang-label">typescript</span><code>engine.<span class="fn">register</span>(<span class="str">'my-flow'</span>, handler, {
+  timeout: <span class="nu">60000</span>,              <span class="cm">// max execution time (ms), default: 30000</span>
+  maxRetries: <span class="nu">5</span>,               <span class="cm">// retry attempts on transient failure, default: 3</span>
+  baseRetryDelay: <span class="nu">2000</span>,        <span class="cm">// initial backoff (ms), default: 1000</span>
+  maxRetryDelay: <span class="nu">60000</span>,        <span class="cm">// backoff cap (ms), default: 30000</span>
+  waitTimeout: <span class="nu">3600000</span>,        <span class="cm">// max time in waiting state (ms), default: 0 (indefinite)</span>
+  description: <span class="str">'My flow'</span>,      <span class="cm">// for MCP server and HTTP API</span>
+  inputSchema: { type: <span class="str">'object'</span>, properties: { query: { type: <span class="str">'string'</span> } } },
+  schedule: <span class="str">'0 8 * * *'</span>,       <span class="cm">// cron expression</span>
+  timezone: <span class="str">'America/New_York'</span>, <span class="cm">// IANA timezone for schedule</span>
+  objective: <span class="str">'customer-support'</span>, <span class="cm">// primary business objective</span>
+  secondaryObjectives: [<span class="str">'cost-optimization'</span>],
+  expectedCadence: <span class="str">'daily'</span>,
+  purpose: <span class="str">'Automated customer support triage'</span>,
+  budget: { limit: <span class="nu">1.00</span>, enforcement: <span class="str">'hard'</span> },
+});</code></pre>
+
+<!-- ============================================================ -->
+<!-- MODEL ROUTING -->
+<!-- ============================================================ -->
+<h2 id="model-routing">Model Routing</h2>
+
+<h3>Providers</h3>
+<p>runcor supports four built-in providers:</p>
+<pre><span class="lang-label">typescript</span><code><span class="kw">import</span> { AnthropicProvider, OpenAIProvider, GoogleProvider, MockProvider } <span class="kw">from</span> <span class="str">'runcor'</span>;
+
+<span class="kw">const</span> engine = <span class="kw">await</span> <span class="fn">createEngine</span>({
+  model: {
+    providers: [
+      { provider: <span class="kw">new</span> <span class="fn">AnthropicProvider</span>({ apiKey: <span class="str">'...'</span> }), priority: <span class="nu">1</span> },
+      { provider: <span class="kw">new</span> <span class="fn">OpenAIProvider</span>({ apiKey: <span class="str">'...'</span> }), priority: <span class="nu">2</span> },
+      { provider: <span class="kw">new</span> <span class="fn">GoogleProvider</span>({ apiKey: <span class="str">'...'</span> }), priority: <span class="nu">3</span> },
+    ],
+    strategy: <span class="str">'priority'</span>,
+  },
+});</code></pre>
+
+<p>Or configure via <code>runcor.yaml</code>:</p>
+<pre><span class="lang-label">yaml</span><code><span class="kw">providers</span>:
+  - <span class="kw">type</span>: <span class="str">anthropic</span>
+    <span class="kw">apiKey</span>: <span class="str">${ANTHROPIC_API_KEY}</span>
+    <span class="kw">priority</span>: <span class="nu">1</span>
+    <span class="kw">models</span>: [<span class="str">claude-sonnet-4-20250514</span>]
+  - <span class="kw">type</span>: <span class="str">openai</span>
+    <span class="kw">apiKey</span>: <span class="str">${OPENAI_API_KEY}</span>
+    <span class="kw">priority</span>: <span class="nu">2</span>
+    <span class="kw">models</span>: [<span class="str">gpt-4o</span>]
+  - <span class="kw">type</span>: <span class="str">google</span>
+    <span class="kw">apiKey</span>: <span class="str">${GOOGLE_API_KEY}</span>
+    <span class="kw">priority</span>: <span class="nu">3</span>
+    <span class="kw">models</span>: [<span class="str">gemini-2.0-flash</span>]</code></pre>
+
+<h3>Routing strategies</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Strategy</th><th>Behavior</th></tr></thead>
+<tbody>
+<tr><td><code>priority</code></td><td>Use highest-priority provider first, fall back on failure (default)</td></tr>
+<tr><td><code>round-robin</code></td><td>Distribute requests across providers evenly</td></tr>
+<tr><td><code>lowest-cost</code></td><td>Route to the cheapest provider by token cost</td></tr>
+</tbody>
+</table></div>
+
+<h3>Circuit breaker</h3>
+<p>Each provider has a circuit breaker that tracks failures:</p>
+<ul>
+<li><strong>Healthy</strong> &mdash; requests flow normally</li>
+<li><strong>Unhealthy</strong> &mdash; after <code>failureThreshold</code> consecutive failures, provider is skipped</li>
+<li><strong>Half-open</strong> &mdash; after <code>cooldownMs</code>, one test request is allowed through</li>
+</ul>
+<pre><span class="lang-label">yaml</span><code><span class="kw">routing</span>:
+  <span class="kw">strategy</span>: <span class="str">priority</span>
+  <span class="kw">maxFallbackAttempts</span>: <span class="nu">3</span>
+  <span class="kw">failureThreshold</span>: <span class="nu">5</span>     <span class="cm"># failures before circuit opens</span>
+  <span class="kw">cooldownMs</span>: <span class="nu">30000</span>        <span class="cm"># time before retry (ms)</span></code></pre>
+
+<h3>Model requests</h3>
+<pre><span class="lang-label">typescript</span><code><span class="kw">const</span> response = <span class="kw">await</span> ctx.model.<span class="fn">complete</span>({
+  prompt: <span class="str">'Summarize this document.'</span>,
+  model: <span class="str">'claude-sonnet-4-20250514'</span>,   <span class="cm">// optional: specific model</span>
+  maxTokens: <span class="nu">1000</span>,                     <span class="cm">// optional: max response tokens</span>
+  temperature: <span class="nu">0.7</span>,                    <span class="cm">// optional: 0-1</span>
+  provider: <span class="str">'anthropic'</span>,              <span class="cm">// optional: pin to specific provider</span>
+  systemPrompt: <span class="str">'You are a helpful assistant.'</span>,
+  messages: [                          <span class="cm">// optional: multi-turn conversation</span>
+    { role: <span class="str">'user'</span>, content: <span class="str">'Hello'</span> },
+    { role: <span class="str">'assistant'</span>, content: <span class="str">'Hi!'</span> },
+    { role: <span class="str">'user'</span>, content: <span class="str">'Tell me more.'</span> },
+  ],
+  tools: [                             <span class="cm">// optional: tool definitions</span>
+    { name: <span class="str">'search'</span>, description: <span class="str">'...'</span>, inputSchema: { ... } },
+  ],
+  responseFormat: { type: <span class="str">'object'</span>, properties: { ... } }, <span class="cm">// optional: JSON Schema</span>
+});
+
+<span class="cm">// Response</span>
+response.text;        <span class="cm">// completion text</span>
+response.model;       <span class="cm">// model used</span>
+response.provider;    <span class="cm">// provider used</span>
+response.usage;       <span class="cm">// { promptTokens, completionTokens }</span>
+response.toolCalls;   <span class="cm">// tool call requests (if any)</span>
+response.parsed;      <span class="cm">// parsed JSON (if responseFormat was a schema)</span></code></pre>
+
+<h3>Streaming</h3>
+<pre><span class="lang-label">typescript</span><code><span class="kw">const</span> stream = ctx.model.<span class="fn">stream</span>({
+  prompt: <span class="str">'Write a story.'</span>,
+});
+
+<span class="kw">for await</span> (<span class="kw">const</span> chunk <span class="kw">of</span> stream) {
+  <span class="kw">if</span> (chunk.type === <span class="str">'text_delta'</span>) {
+    process.stdout.<span class="fn">write</span>(chunk.text);
+  }
+}</code></pre>
+
+<!-- ============================================================ -->
+<!-- COST TRACKING -->
+<!-- ============================================================ -->
+<h2 id="cost-tracking">Cost Tracking</h2>
+
+<h3>Budget configuration</h3>
+<pre><span class="lang-label">typescript</span><code><span class="kw">const</span> engine = <span class="kw">await</span> <span class="fn">createEngine</span>({
+  cost: {
+    budgets: {
+      perRequest: { limit: <span class="nu">0.50</span>, enforcement: <span class="str">'hard'</span> },
+      perUser: { limit: <span class="nu">10.00</span>, enforcement: <span class="str">'hard'</span>, window: { type: <span class="str">'daily'</span> } },
+      perFlow: { limit: <span class="nu">50.00</span>, enforcement: <span class="str">'soft'</span> },
+      global: { limit: <span class="nu">1000.00</span>, enforcement: <span class="str">'hard'</span>, window: { type: <span class="str">'monthly'</span> } },
+    },
+    warningThreshold: <span class="nu">0.8</span>,  <span class="cm">// emit warning at 80% of budget</span>
+  },
+});</code></pre>
+
+<p><strong>Enforcement modes:</strong></p>
+<ul>
+<li><code>hard</code> &mdash; block the request when budget is exceeded</li>
+<li><code>soft</code> &mdash; emit a warning event but allow the request</li>
+<li><code>disabled</code> &mdash; no enforcement</li>
+</ul>
+
+<p><strong>Window types:</strong> <code>hourly</code>, <code>daily</code>, <code>monthly</code>, <code>custom</code> (with <code>durationMs</code>), <code>none</code> (cumulative)</p>
+
+<h3>Accessing cost in flows</h3>
+<pre><span class="lang-label">typescript</span><code>engine.<span class="fn">register</span>(<span class="str">'my-flow'</span>, <span class="kw">async</span> (ctx) => {
+  <span class="kw">const</span> result = <span class="kw">await</span> ctx.model.<span class="fn">complete</span>({ prompt: <span class="str">'...'</span> });
+
+  console.<span class="fn">log</span>(ctx.cost.executionTotal);  <span class="cm">// cumulative cost of this execution</span>
+  console.<span class="fn">log</span>(ctx.cost.requestCount);    <span class="cm">// number of model requests made</span>
+});</code></pre>
+
+<h3>Querying the ledger</h3>
+<pre><span class="lang-label">typescript</span><code><span class="kw">const</span> ledger = engine.<span class="fn">getCostLedger</span>();
+
+<span class="kw">const</span> total = ledger.<span class="fn">getTotal</span>({ userId: <span class="str">'alice'</span> });
+<span class="kw">const</span> entries = ledger.<span class="fn">query</span>({
+  flowName: <span class="str">'morning-brief'</span>,
+  startTime: <span class="kw">new</span> <span class="fn">Date</span>(<span class="str">'2026-03-01'</span>),
+  endTime: <span class="kw">new</span> <span class="fn">Date</span>(<span class="str">'2026-03-07'</span>),
+});</code></pre>
+
+<!-- ============================================================ -->
+<!-- SCOPED MEMORY -->
+<!-- ============================================================ -->
+<h2 id="scoped-memory">Scoped Memory</h2>
+
+<p>Three memory scopes with different lifetimes:</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Scope</th><th>Lifetime</th><th>Namespace</th></tr></thead>
+<tbody>
+<tr><td><code>tool</code></td><td>Persistent per flow</td><td>Shared across all executions of the same flow</td></tr>
+<tr><td><code>user</code></td><td>Persistent per user</td><td>Shared across all flows for the same userId</td></tr>
+<tr><td><code>session</code></td><td>Ephemeral per execution</td><td>Scoped to a single execution (gone after completion)</td></tr>
+</tbody>
+</table></div>
+
+<h3>Usage</h3>
+<pre><span class="lang-label">typescript</span><code>engine.<span class="fn">register</span>(<span class="str">'my-flow'</span>, <span class="kw">async</span> (ctx) => {
+  <span class="cm">// Tool memory — persistent per flow</span>
+  <span class="kw">const</span> counter = (<span class="kw">await</span> ctx.memory.tool.<span class="fn">get</span>&lt;<span class="ty">number</span>&gt;(<span class="str">'call-count'</span>)) ?? <span class="nu">0</span>;
+  <span class="kw">await</span> ctx.memory.tool.<span class="fn">set</span>(<span class="str">'call-count'</span>, counter + <span class="nu">1</span>);
+
+  <span class="cm">// User memory — persistent per user</span>
+  <span class="kw">await</span> ctx.memory.user.<span class="fn">set</span>(<span class="str">'preferences'</span>, { theme: <span class="str">'dark'</span> });
+  <span class="kw">const</span> prefs = <span class="kw">await</span> ctx.memory.user.<span class="fn">get</span>(<span class="str">'preferences'</span>);
+
+  <span class="cm">// Session memory — ephemeral</span>
+  <span class="kw">await</span> ctx.memory.session.<span class="fn">set</span>(<span class="str">'temp-token'</span>, <span class="str">'abc123'</span>);
+
+  <span class="cm">// TTL support (seconds)</span>
+  <span class="kw">await</span> ctx.memory.tool.<span class="fn">set</span>(<span class="str">'cache-key'</span>, data, <span class="nu">300</span>); <span class="cm">// expires in 5 minutes</span>
+
+  <span class="cm">// List keys</span>
+  <span class="kw">const</span> keys = <span class="kw">await</span> ctx.memory.tool.<span class="fn">list</span>();
+
+  <span class="cm">// Delete</span>
+  <span class="kw">await</span> ctx.memory.tool.<span class="fn">delete</span>(<span class="str">'old-key'</span>);
+});</code></pre>
+
+<!-- ============================================================ -->
+<!-- WAIT / RESUME / REPLAY -->
+<!-- ============================================================ -->
+<h2 id="wait--resume--replay">Wait / Resume / Replay</h2>
+
+<h3>Pausing for external input</h3>
+<pre><span class="lang-label">typescript</span><code><span class="kw">import</span> { createWaitSignal } <span class="kw">from</span> <span class="str">'runcor'</span>;
+
+engine.<span class="fn">register</span>(<span class="str">'approval-flow'</span>, <span class="kw">async</span> (ctx) => {
+  <span class="kw">if</span> (!ctx.resumeData) {
+    <span class="cm">// First run: pause and wait for approval</span>
+    <span class="kw">return</span> <span class="fn">createWaitSignal</span>({
+      reason: <span class="str">'Awaiting manager approval'</span>,
+      expectedResumeBy: <span class="kw">new</span> <span class="fn">Date</span>(Date.<span class="fn">now</span>() + <span class="nu">86400000</span>), <span class="cm">// 24h</span>
+      waitData: { requestId: <span class="str">'req-123'</span> },
+    });
+  }
+
+  <span class="cm">// Resumed with approval data</span>
+  <span class="kw">const</span> { approved, comments } = ctx.resumeData <span class="kw">as</span> { approved: <span class="ty">boolean</span>; comments: <span class="ty">string</span> };
+  <span class="kw">if</span> (approved) {
+    <span class="kw">return</span> <span class="str">'Request approved: '</span> + comments;
+  }
+  <span class="kw">return</span> <span class="str">'Request denied'</span>;
+});
+
+<span class="cm">// Trigger — execution pauses in "waiting" state</span>
+<span class="kw">const</span> exec = <span class="kw">await</span> engine.<span class="fn">trigger</span>(<span class="str">'approval-flow'</span>, { idempotencyKey: <span class="str">'approval-001'</span> });
+
+<span class="cm">// Later — resume with data</span>
+<span class="kw">await</span> engine.<span class="fn">resume</span>(exec.id, { approved: <span class="kw">true</span>, comments: <span class="str">'Looks good'</span> });</code></pre>
+
+<h3>Replaying executions</h3>
+<p>Replay creates a new execution from a completed one, using the same input:</p>
+<pre><span class="lang-label">typescript</span><code><span class="kw">const</span> original = <span class="kw">await</span> engine.<span class="fn">trigger</span>(<span class="str">'my-flow'</span>, { idempotencyKey: <span class="str">'key-1'</span>, input: { x: <span class="nu">1</span> } });
+<span class="cm">// ... execution completes ...</span>
+
+<span class="kw">const</span> replay = <span class="kw">await</span> engine.<span class="fn">replay</span>(original.id);
+<span class="cm">// New execution with same input, new ID</span></code></pre>
+
+<!-- ============================================================ -->
+<!-- AGENT EXECUTION -->
+<!-- ============================================================ -->
+<h2 id="agent-execution">Agent Execution</h2>
+
+<p>Create autonomous agents that loop through model calls and tool invocations:</p>
+<pre><span class="lang-label">typescript</span><code><span class="kw">import</span> { createAgentHandler } <span class="kw">from</span> <span class="str">'runcor'</span>;
+
+engine.<span class="fn">register</span>(<span class="str">'research-agent'</span>, <span class="fn">createAgentHandler</span>({
+  systemPrompt: <span class="str">'You are a research assistant. Use tools to find information.'</span>,
+  tools: [<span class="str">'gmail.search'</span>, <span class="str">'slack.search'</span>],  <span class="cm">// qualified tool names</span>
+  maxIterations: <span class="nu">10</span>,
+  timeoutMs: <span class="nu">120000</span>,
+  iterationBudget: <span class="nu">0.50</span>,                    <span class="cm">// max cost per iteration</span>
+  outputSchema: {                            <span class="cm">// optional structured final answer</span>
+    type: <span class="str">'object'</span>,
+    properties: {
+      summary: { type: <span class="str">'string'</span> },
+      sources: { type: <span class="str">'array'</span>, items: { type: <span class="str">'string'</span> } },
+    },
+    required: [<span class="str">'summary'</span>],
+  },
+}));
+
+<span class="kw">const</span> exec = <span class="kw">await</span> engine.<span class="fn">trigger</span>(<span class="str">'research-agent'</span>, {
+  idempotencyKey: <span class="str">'research-001'</span>,
+  input: { query: <span class="str">'What were last quarter revenue numbers?'</span> },
+});</code></pre>
+
+<h3>Agent result</h3>
+<pre><span class="lang-label">typescript</span><code><span class="kw">interface</span> <span class="ty">AgentResult</span> {
+  answer: <span class="ty">unknown</span>;           <span class="cm">// final model response</span>
+  stopReason: <span class="str">'completed'</span> | <span class="str">'max_iterations'</span> | <span class="str">'budget_exhausted'</span> | <span class="str">'timeout'</span> | <span class="str">'context_overflow'</span>;
+  iterations: <span class="ty">Array</span>&lt;{
+    model: <span class="ty">string</span>;
+    toolCalls: <span class="ty">ToolCallRequest</span>[];
+    toolResults: <span class="ty">ToolCallResult</span>[];
+    cost: <span class="ty">number</span>;
+  }&gt;;
+  totalCost: <span class="ty">number</span>;
+  totalTokens: { input: <span class="ty">number</span>; output: <span class="ty">number</span> };
+  conversationLength: <span class="ty">number</span>;
+}</code></pre>
+
+<!-- ============================================================ -->
+<!-- STRUCTURED OUTPUT -->
+<!-- ============================================================ -->
+<h2 id="structured-output">Structured Output</h2>
+
+<p>Request JSON-conformant model responses with automatic validation and retry:</p>
+<pre><span class="lang-label">typescript</span><code>engine.<span class="fn">register</span>(<span class="str">'extract-data'</span>, <span class="kw">async</span> (ctx) => {
+  <span class="kw">const</span> response = <span class="kw">await</span> ctx.model.<span class="fn">complete</span>({
+    prompt: <span class="str">'Extract the person\'s name, age, and status from: "Alice is 30 and active."'</span>,
+    responseFormat: {
+      type: <span class="str">'object'</span>,
+      properties: {
+        name: { type: <span class="str">'string'</span> },
+        age: { type: <span class="str">'integer'</span> },
+        active: { type: <span class="str">'boolean'</span> },
+      },
+      required: [<span class="str">'name'</span>, <span class="str">'age'</span>, <span class="str">'active'</span>],
+    },
+  });
+
+  <span class="kw">const</span> data = response.parsed;
+  <span class="cm">// { name: 'Alice', age: 30, active: true }</span>
+});</code></pre>
+
+<p>If the model response fails schema validation, runcor automatically retries once with a hint. If the retry also fails, a <code>ValidationError</code> is thrown.</p>
+
+<!-- ============================================================ -->
+<!-- POLICY & GUARDRAILS -->
+<!-- ============================================================ -->
+<h2 id="policy--guardrails">Policy &amp; Guardrails</h2>
+
+<h3>Policy rules</h3>
+<p>Gate operations based on flow name, user, tenant, or custom logic:</p>
+<pre><span class="lang-label">typescript</span><code>engine.<span class="fn">addPolicy</span>({
+  name: <span class="str">'block-expensive-flows'</span>,
+  operations: [<span class="str">'trigger'</span>],
+  evaluate: (context) => {
+    <span class="kw">if</span> (context.flowName === <span class="str">'bulk-export'</span> && context.userId !== <span class="str">'admin'</span>) {
+      <span class="kw">return</span> { action: <span class="str">'deny'</span>, reason: <span class="str">'Only admins can run bulk exports'</span> };
+    }
+    <span class="kw">return</span> { action: <span class="str">'allow'</span>, reason: <span class="kw">null</span> };
+  },
+});</code></pre>
+
+<h3>Content guardrails</h3>
+<p>Inspect and filter input/output content:</p>
+<pre><span class="lang-label">typescript</span><code>engine.<span class="fn">addGuardrail</span>({
+  name: <span class="str">'no-pii'</span>,
+  phase: <span class="str">'output'</span>,
+  mode: <span class="str">'block'</span>,     <span class="cm">// 'block' | 'warn' | 'transform'</span>
+  handler: <span class="kw">async</span> (content, context) => {
+    <span class="kw">if</span> (<span class="fn">containsPII</span>(content)) {
+      <span class="kw">return</span> { action: <span class="str">'block'</span>, reason: <span class="str">'Output contains PII'</span> };
+    }
+    <span class="kw">return</span> { action: <span class="str">'pass'</span>, reason: <span class="kw">null</span> };
+  },
+});</code></pre>
+
+<h3>Rate limiting</h3>
+<pre><span class="lang-label">typescript</span><code>engine.<span class="fn">addRateLimit</span>({
+  name: <span class="str">'per-user-limit'</span>,
+  scope: <span class="str">'user'</span>,       <span class="cm">// 'user' | 'flow' | 'global'</span>
+  limit: <span class="nu">100</span>,
+  windowMs: <span class="nu">3600000</span>,   <span class="cm">// 1 hour</span>
+  behavior: <span class="str">'reject'</span>,  <span class="cm">// 'reject' | 'queue'</span>
+});</code></pre>
+
+<h3>Access control</h3>
+<pre><span class="lang-label">typescript</span><code>engine.<span class="fn">setAccessPolicy</span>({
+  identity: <span class="str">'viewer@company.com'</span>,
+  allowedOperations: [<span class="str">'trigger'</span>],      <span class="cm">// can only trigger, not cancel/resume/replay</span>
+  deniedFlows: [<span class="str">'admin-panel'</span>],
+});</code></pre>
+
+<h3>Multi-tenant configuration</h3>
+<pre><span class="lang-label">typescript</span><code>engine.<span class="fn">setTenantConfig</span>({
+  tenantId: <span class="str">'customer-a'</span>,
+  allowedFlows: [<span class="str">'customer-a-report'</span>],
+  rateLimits: [{ name: <span class="str">'tenant-a-limit'</span>, scope: <span class="str">'global'</span>, limit: <span class="nu">50</span>, windowMs: <span class="nu">86400000</span> }],
+});</code></pre>
+
+<!-- ============================================================ -->
+<!-- EVALUATION & QUALITY -->
+<!-- ============================================================ -->
+<h2 id="evaluation--quality">Evaluation &amp; Quality</h2>
+
+<h3>Registering evaluators</h3>
+<pre><span class="lang-label">typescript</span><code>engine.<span class="fn">addEvaluator</span>({
+  name: <span class="str">'quality-check'</span>,
+  flowNames: [<span class="str">'morning-brief'</span>],    <span class="cm">// null = all flows</span>
+  evaluate: (context) => {
+    <span class="kw">const</span> output = <span class="fn">String</span>(context.output);
+    <span class="kw">return</span> {
+      scores: {
+        length: Math.<span class="fn">min</span>(output.length / <span class="nu">500</span>, <span class="nu">1.0</span>),
+        hasActionItems: output.<span class="fn">includes</span>(<span class="str">'action'</span>) ? <span class="nu">1.0</span> : <span class="nu">0.0</span>,
+      },
+      labels: output.length > <span class="nu">200</span> ? [<span class="str">'detailed'</span>] : [<span class="str">'brief'</span>],
+      feedback: output.length < <span class="nu">50</span> ? <span class="str">'Response too short'</span> : <span class="kw">null</span>,
+    };
+  },
+});</code></pre>
+
+<h3>Built-in evaluators</h3>
+<pre><span class="lang-label">typescript</span><code><span class="kw">import</span> { createLengthEvaluator, createFormatEvaluator, createKeywordEvaluator } <span class="kw">from</span> <span class="str">'runcor'</span>;
+
+engine.<span class="fn">addEvaluator</span>(<span class="fn">createLengthEvaluator</span>({ minLength: <span class="nu">50</span>, maxLength: <span class="nu">2000</span> }));
+engine.<span class="fn">addEvaluator</span>(<span class="fn">createFormatEvaluator</span>({ expectedFormat: <span class="str">'json'</span> }));
+engine.<span class="fn">addEvaluator</span>(<span class="fn">createKeywordEvaluator</span>({ required: [<span class="str">'summary'</span>, <span class="str">'recommendation'</span>] }));</code></pre>
+
+<h3>Evaluation results</h3>
+<pre><span class="lang-label">typescript</span><code><span class="kw">const</span> evaluation = engine.<span class="fn">getEvaluation</span>(executionId);
+<span class="cm">// {</span>
+<span class="cm">//   overallScore: 0.85,</span>
+<span class="cm">//   confidence: 'high',        // 'high' | 'medium' | 'low'</span>
+<span class="cm">//   aggregateScores: { length: 0.9, hasActionItems: 0.8 },</span>
+<span class="cm">//   labels: ['detailed'],</span>
+<span class="cm">// }</span></code></pre>
+
+<h3>Human review flags</h3>
+<pre><span class="lang-label">typescript</span><code><span class="cm">// Auto-flagging (via config)</span>
+<span class="kw">const</span> engine = <span class="kw">await</span> <span class="fn">createEngine</span>({
+  evaluation: { autoFlagScoreThreshold: <span class="nu">0.3</span> }, <span class="cm">// flag scores below 0.3</span>
+});
+
+<span class="cm">// Manual flagging</span>
+<span class="kw">await</span> engine.<span class="fn">flagExecution</span>(executionId, <span class="str">'Needs review — unusual output'</span>);
+
+<span class="cm">// Managing flags</span>
+<span class="kw">const</span> flags = engine.<span class="fn">listFlags</span>({ status: <span class="str">'pending'</span> });
+engine.<span class="fn">updateFlag</span>(executionId, <span class="str">'reviewed'</span>);
+engine.<span class="fn">updateFlag</span>(executionId, <span class="str">'resolved'</span>);</code></pre>
+
+<!-- ============================================================ -->
+<!-- MCP ADAPTERS -->
+<!-- ============================================================ -->
+<h2 id="mcp-adapters">MCP Adapters</h2>
+
+<p>Connect to external systems via the Model Context Protocol:</p>
+
+<h3>Configuration</h3>
+<pre><span class="lang-label">yaml</span><code><span class="kw">connections</span>:
+  - <span class="kw">name</span>: <span class="str">gmail</span>
+    <span class="kw">preset</span>: <span class="str">gmail</span>
+    <span class="kw">url</span>: <span class="str">${GMAIL_MCP_URL}</span>
+  - <span class="kw">name</span>: <span class="str">slack</span>
+    <span class="kw">preset</span>: <span class="str">slack</span>
+    <span class="kw">url</span>: <span class="str">${SLACK_MCP_URL}</span>
+  - <span class="kw">name</span>: <span class="str">calendar</span>
+    <span class="kw">preset</span>: <span class="str">calendar</span>
+    <span class="kw">url</span>: <span class="str">${CALENDAR_MCP_URL}</span>
+  - <span class="kw">name</span>: <span class="str">custom-api</span>
+    <span class="kw">transport</span>: <span class="str">sse</span>
+    <span class="kw">url</span>: <span class="str">https://api.example.com/mcp</span>
+    <span class="kw">headers</span>:
+      <span class="kw">Authorization</span>: <span class="str">"Bearer ${API_TOKEN}"</span></code></pre>
+
+<h3>Programmatic usage</h3>
+<pre><span class="lang-label">typescript</span><code><span class="kw">await</span> engine.<span class="fn">addAdapter</span>({
+  name: <span class="str">'my-api'</span>,
+  transport: <span class="str">'sse'</span>,
+  url: <span class="str">'https://api.example.com/mcp'</span>,
+  timeoutMs: <span class="nu">30000</span>,
+  retryAttempts: <span class="nu">3</span>,
+});
+
+<span class="cm">// List available tools</span>
+<span class="kw">const</span> tools = engine.<span class="fn">listAdapterTools</span>();
+<span class="cm">// [{ qualifiedName: 'my-api.searchUsers', description: '...', inputSchema: { ... } }]</span>
+
+<span class="cm">// Call a tool directly</span>
+<span class="kw">const</span> result = <span class="kw">await</span> engine.<span class="fn">callAdapterTool</span>(<span class="str">'my-api.searchUsers'</span>, { query: <span class="str">'alice'</span> });</code></pre>
+
+<h3>Using tools in flows</h3>
+<pre><span class="lang-label">typescript</span><code>engine.<span class="fn">register</span>(<span class="str">'email-summary'</span>, <span class="kw">async</span> (ctx) => {
+  <span class="cm">// Discover available tools</span>
+  <span class="kw">const</span> tools = ctx.tools.<span class="fn">listTools</span>({ adapter: <span class="str">'gmail'</span> });
+
+  <span class="cm">// Call a tool</span>
+  <span class="kw">const</span> emails = <span class="kw">await</span> ctx.tools.<span class="fn">callTool</span>(<span class="str">'gmail.search'</span>, {
+    query: <span class="str">'is:unread after:today'</span>,
+    maxResults: <span class="nu">10</span>,
+  });
+
+  <span class="kw">const</span> response = <span class="kw">await</span> ctx.model.<span class="fn">complete</span>({
+    prompt: <span class="str">`Summarize these emails: ${JSON.stringify(emails)}`</span>,
+  });
+
+  <span class="kw">return</span> response.text;
+});</code></pre>
+
+<!-- ============================================================ -->
+<!-- MCP SERVER -->
+<!-- ============================================================ -->
+<h2 id="mcp-server">MCP Server</h2>
+
+<p>Expose registered flows as MCP tools for other AI agents to discover and invoke:</p>
+<pre><span class="lang-label">typescript</span><code><span class="kw">const</span> engine = <span class="kw">await</span> <span class="fn">createEngine</span>({
+  server: { name: <span class="str">'my-app'</span>, version: <span class="str">'1.0.0'</span> },
+});
+
+engine.<span class="fn">register</span>(<span class="str">'my-flow'</span>, handler, {
+  description: <span class="str">'Does something useful'</span>,
+  inputSchema: { type: <span class="str">'object'</span>, properties: { query: { type: <span class="str">'string'</span> } } },
+});
+
+<span class="kw">await</span> engine.<span class="fn">startServer</span>();
+<span class="cm">// Other MCP clients can now discover and call 'my-flow'</span>
+
+<span class="kw">await</span> engine.<span class="fn">stopServer</span>();</code></pre>
+
+<!-- ============================================================ -->
+<!-- SCHEDULED FLOWS -->
+<!-- ============================================================ -->
+<h2 id="scheduled-flows">Scheduled Flows</h2>
+
+<p>Trigger flows on a cron schedule:</p>
+<pre><span class="lang-label">typescript</span><code>engine.<span class="fn">register</span>(<span class="str">'daily-report'</span>, handler, {
+  schedule: <span class="str">'0 8 * * *'</span>,            <span class="cm">// 8 AM daily</span>
+  timezone: <span class="str">'America/New_York'</span>,
+});</code></pre>
+
+<p>Or via configuration:</p>
+<pre><span class="lang-label">yaml</span><code><span class="kw">scheduler</span>:
+  <span class="kw">defaultTimezone</span>: <span class="str">America/New_York</span>
+  <span class="kw">flows</span>:
+    <span class="kw">daily-report</span>:
+      <span class="kw">cron</span>: <span class="str">"0 8 * * *"</span>
+      <span class="kw">timezone</span>: <span class="str">America/New_York</span></code></pre>
+
+<p>Features:</p>
+<ul>
+<li>IANA timezone support</li>
+<li>Overlap prevention (skips if previous execution is still running)</li>
+<li>Automatic idempotency keys per scheduled trigger</li>
+</ul>
+
+<!-- ============================================================ -->
+<!-- DISCERNMENT -->
+<!-- ============================================================ -->
+<h2 id="discernment">Discernment</h2>
+
+<p>Portfolio-level analysis that determines whether your AI workflows deliver business value.</p>
+
+<h3>Configuration</h3>
+<pre><span class="lang-label">yaml</span><code><span class="kw">discernment</span>:
+  <span class="kw">enabled</span>: <span class="kw">true</span>
+  <span class="kw">autonomy</span>: <span class="str">recommend</span>     <span class="cm"># observe | recommend | advise | enforce</span>
+  <span class="kw">schedule</span>: <span class="str">daily</span>
+
+<span class="kw">objectives</span>:
+  - <span class="kw">name</span>: <span class="str">customer-support</span>
+    <span class="kw">description</span>: <span class="str">"Reduce support ticket volume through automated responses"</span>
+  - <span class="kw">name</span>: <span class="str">operational-visibility</span>
+    <span class="kw">description</span>: <span class="str">"Leadership has daily visibility into business metrics"</span></code></pre>
+
+<h3>Tagging flows to objectives</h3>
+<pre><span class="lang-label">typescript</span><code>engine.<span class="fn">register</span>(<span class="str">'support-triage'</span>, handler, {
+  objective: <span class="str">'customer-support'</span>,
+  expectedCadence: <span class="str">'hourly'</span>,
+  purpose: <span class="str">'Automated support ticket classification'</span>,
+});</code></pre>
+
+<h3>Running analysis</h3>
+<pre><span class="lang-label">typescript</span><code><span class="cm">// Manual cycle</span>
+<span class="kw">const</span> report = <span class="kw">await</span> engine.<span class="fn">runDiscernmentCycle</span>();
+
+<span class="cm">// Report includes:</span>
+<span class="cm">// - System profile (flow stats, cost, quality, adapter health)</span>
+<span class="cm">// - Signals (idle flows, cost outliers, quality decline, agent hard stops)</span>
+<span class="cm">// - Recommendations (keep, optimize, merge, retire, investigate, escalate)</span>
+<span class="cm">// - Objective summaries</span>
+
+<span class="cm">// Get recommendations</span>
+<span class="kw">const</span> recs = engine.<span class="fn">getRecommendations</span>({ action: <span class="str">'retire'</span> });
+engine.<span class="fn">acknowledgeRecommendation</span>(recs[<span class="nu">0</span>].id);</code></pre>
+
+<h3>Autonomy levels</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Level</th><th>Behavior</th></tr></thead>
+<tbody>
+<tr><td><code>observe</code></td><td>Collect signals only</td></tr>
+<tr><td><code>recommend</code></td><td>Signals + model-generated recommendations</td></tr>
+<tr><td><code>advise</code></td><td>Recommendations require acknowledgment</td></tr>
+<tr><td><code>enforce</code></td><td>Auto-execute recommendations after grace period</td></tr>
+</tbody>
+</table></div>
+
+<h3>Built-in heuristic checks</h3>
+<ul>
+<li><strong>Idle flow</strong> &mdash; no executions in N days</li>
+<li><strong>Disproportionate cost</strong> &mdash; flow uses &gt; X% of total budget</li>
+<li><strong>Quality decline</strong> &mdash; evaluation scores dropping</li>
+<li><strong>Agent hard stops</strong> &mdash; agents hitting max iterations/budget/timeout</li>
+<li><strong>Untagged flows</strong> &mdash; flows without business objectives</li>
+<li><strong>Overlap issues</strong> &mdash; scheduled flows running concurrently</li>
+</ul>
+
+<h3>Custom heuristics</h3>
+<pre><span class="lang-label">typescript</span><code>engine.<span class="fn">addHeuristic</span>({
+  name: <span class="str">'low-usage'</span>,
+  check: (profile) => {
+    <span class="kw">if</span> (profile.executionCount < <span class="nu">5</span> && profile.totalCost > <span class="nu">10</span>) {
+      <span class="kw">return</span> {
+        id: crypto.<span class="fn">randomUUID</span>(),
+        checkName: <span class="str">'low-usage'</span>,
+        target: profile.flowName,
+        targetType: <span class="str">'flow'</span>,
+        severity: <span class="str">'warning'</span>,
+        evidence: { executions: profile.executionCount, cost: profile.totalCost },
+        timestamp: <span class="kw">new</span> <span class="fn">Date</span>(),
+      };
+    }
+    <span class="kw">return</span> <span class="kw">null</span>;
+  },
+});</code></pre>
+
+<!-- ============================================================ -->
+<!-- HTTP SERVER -->
+<!-- ============================================================ -->
+<h2 id="http-server">HTTP Server</h2>
+
+<h3>Starting the server</h3>
+<pre><span class="lang-label">typescript</span><code><span class="kw">import</span> { createEngine, createServer } <span class="kw">from</span> <span class="str">'runcor'</span>;
+
+<span class="kw">const</span> engine = <span class="kw">await</span> <span class="fn">createEngine</span>();
+engine.<span class="fn">register</span>(<span class="str">'my-flow'</span>, handler);
+
+<span class="kw">const</span> server = <span class="kw">await</span> <span class="fn">createServer</span>(engine, {
+  port: <span class="nu">3000</span>,
+  hostname: <span class="str">'127.0.0.1'</span>,
+  cors: { origin: <span class="str">'https://myapp.com'</span> },
+});
+
+<span class="cm">// Or via CLI: runcor dev</span></code></pre>
+
+<h3>Authentication</h3>
+<p>Set <code>AUTH_TOKEN</code> environment variable to enable Bearer token authentication on mutating endpoints (POST, DELETE, PUT, PATCH).</p>
+
+<h3>Endpoints</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Method</th><th>Path</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>GET</td><td><code>/v1/health</code></td><td>Engine status, uptime, capabilities</td></tr>
+<tr><td>GET</td><td><code>/v1/flows</code></td><td>List registered flows</td></tr>
+<tr><td>POST</td><td><code>/v1/flows/:name/trigger</code></td><td>Trigger a flow</td></tr>
+<tr><td>GET</td><td><code>/v1/executions</code></td><td>List executions (with <code>state</code>, <code>flowName</code>, <code>limit</code>, <code>offset</code> query params)</td></tr>
+<tr><td>GET</td><td><code>/v1/executions/:id</code></td><td>Get execution by ID</td></tr>
+<tr><td>GET</td><td><code>/v1/executions/:id/detail</code></td><td>Get execution with cost entries and evaluation</td></tr>
+<tr><td>POST</td><td><code>/v1/executions/:id/resume</code></td><td>Resume a waiting execution</td></tr>
+<tr><td>POST</td><td><code>/v1/executions/:id/replay</code></td><td>Replay a completed execution</td></tr>
+<tr><td>POST</td><td><code>/v1/executions/:id/cancel</code></td><td>Cancel execution</td></tr>
+<tr><td>DELETE</td><td><code>/v1/executions/:id</code></td><td>Delete terminal execution</td></tr>
+<tr><td>GET</td><td><code>/v1/adapters</code></td><td>List adapters and tools</td></tr>
+<tr><td>POST</td><td><code>/v1/adapters/:name/tools/:tool</code></td><td>Call adapter tool</td></tr>
+<tr><td>GET</td><td><code>/v1/events</code></td><td>SSE event stream (with <code>type</code>, <code>executionId</code> filters)</td></tr>
+<tr><td>GET</td><td><code>/v1/providers</code></td><td>Provider health and circuit breaker states</td></tr>
+<tr><td>GET</td><td><code>/v1/cost/summary</code></td><td>Cost totals by flow, user, and provider</td></tr>
+<tr><td>GET</td><td><code>/v1/discernment</code></td><td>Objectives, latest report, recommendations</td></tr>
+<tr><td>GET</td><td><code>/v1/dashboard</code></td><td>Built-in monitoring dashboard</td></tr>
+</tbody>
+</table></div>
+
+<h3>Trigger example</h3>
+<pre><span class="lang-label">bash</span><code><span class="fn">curl</span> -X POST http://localhost:3000/v1/flows/morning-brief/trigger \
+  -H <span class="str">"Content-Type: application/json"</span> \
+  -H <span class="str">"Authorization: Bearer $AUTH_TOKEN"</span> \
+  -d <span class="str">'{"idempotencyKey": "brief-001", "userId": "alice"}'</span></code></pre>
+
+<h3>SSE event stream</h3>
+<pre><span class="lang-label">bash</span><code><span class="fn">curl</span> -N http://localhost:3000/v1/events?type=execution,cost</code></pre>
+
+<!-- ============================================================ -->
+<!-- CLI -->
+<!-- ============================================================ -->
+<h2 id="cli">CLI</h2>
+
+<pre><span class="lang-label">bash</span><code><span class="cm"># Scaffold a new project</span>
+<span class="fn">runcor</span> init my-project
+
+<span class="cm"># Start dev server with auto-reload</span>
+<span class="fn">runcor</span> dev
+<span class="fn">runcor</span> dev --config path/to/runcor.yaml
+
+<span class="cm"># Trigger a flow</span>
+<span class="fn">runcor</span> trigger morning-brief --input <span class="str">'{"date": "2026-03-07"}'</span>
+
+<span class="cm"># Check execution status</span>
+<span class="fn">runcor</span> status
+<span class="fn">runcor</span> status &lt;execution-id&gt;
+
+<span class="cm"># Resume a waiting execution</span>
+<span class="fn">runcor</span> resume &lt;execution-id&gt;</code></pre>
+
+<h3>Project scaffolding</h3>
+<p><code>runcor init [project-name]</code> creates:</p>
+<pre class="diagram"><code>my-project/
+  runcor.yaml          # configuration (project name in header)
+  flows/
+    hello.mjs          # example flow
+  .env.example         # environment template
+  package.json
+  tsconfig.json</code></pre>
+<p>The project name can be passed as a positional argument or with <code>--name</code>. If omitted, the current directory name is used.</p>
+
+<!-- ============================================================ -->
+<!-- SQLITE PERSISTENCE -->
+<!-- ============================================================ -->
+<h2 id="sqlite-persistence">SQLite Persistence</h2>
+
+<p>Use SQLite for durable execution state that survives process restarts:</p>
+<pre><span class="lang-label">yaml</span><code><span class="kw">state</span>:
+  <span class="kw">type</span>: <span class="str">sqlite</span>
+  <span class="kw">path</span>: <span class="str">./data/runcor.db</span></code></pre>
+
+<p>Or programmatically:</p>
+<pre><span class="lang-label">typescript</span><code><span class="kw">import</span> { SQLiteStateStore } <span class="kw">from</span> <span class="str">'runcor'</span>;
+
+<span class="kw">const</span> engine = <span class="kw">await</span> <span class="fn">createEngine</span>({
+  state: {
+    type: <span class="str">'sqlite'</span>,
+    path: <span class="str">'./data/runcor.db'</span>,
+    onOrphanedExecution: (exec) => <span class="str">'fail'</span>,  <span class="cm">// 'fail' | 'requeue' | 'ignore'</span>
+  },
+});</code></pre>
+
+<p>Features:</p>
+<ul>
+<li>WAL mode for concurrent reads during writes</li>
+<li>Automatic schema creation on first use</li>
+<li>Orphaned execution recovery on startup (executions left <code>running</code> from a crash)</li>
+<li>Same <code>StateStore</code> interface as in-memory &mdash; drop-in replacement</li>
+</ul>
+
+<!-- ============================================================ -->
+<!-- OBSERVABILITY -->
+<!-- ============================================================ -->
+<h2 id="observability">Observability</h2>
+
+<h3>OpenTelemetry integration</h3>
+<pre><span class="lang-label">typescript</span><code><span class="kw">import</span> { NodeTracerProvider } <span class="kw">from</span> <span class="str">'@opentelemetry/sdk-trace-node'</span>;
+
+<span class="kw">const</span> tracerProvider = <span class="kw">new</span> <span class="fn">NodeTracerProvider</span>();
+tracerProvider.<span class="fn">register</span>();
+
+<span class="kw">const</span> engine = <span class="kw">await</span> <span class="fn">createEngine</span>({
+  telemetry: {
+    tracerProvider,
+    serviceName: <span class="str">'my-ai-app'</span>,
+    serviceVersion: <span class="str">'1.0.0'</span>,
+  },
+});</code></pre>
+
+<p>Every execution produces:</p>
+<ul>
+<li><strong>Spans</strong> &mdash; one per execution, model call, retry, wait/resume</li>
+<li><strong>Metrics</strong> &mdash; execution count, latency, error rate, token usage</li>
+<li><strong>Logs</strong> &mdash; structured JSON with execution context</li>
+</ul>
+
+<h3>Custom instrumentation in flows</h3>
+<pre><span class="lang-label">typescript</span><code>engine.<span class="fn">register</span>(<span class="str">'my-flow'</span>, <span class="kw">async</span> (ctx) => {
+  ctx.telemetry.<span class="fn">setAttribute</span>(<span class="str">'custom.input_length'</span>, <span class="fn">String</span>(ctx.input).length);
+  ctx.telemetry.<span class="fn">addEvent</span>(<span class="str">'processing_started'</span>, { step: <span class="str">'analysis'</span> });
+
+  <span class="kw">const</span> result = <span class="kw">await</span> ctx.telemetry.<span class="fn">startSpan</span>(<span class="str">'heavy-computation'</span>, <span class="kw">async</span> () => {
+    <span class="kw">return</span> <span class="fn">doHeavyWork</span>();
+  });
+
+  <span class="kw">return</span> result;
+});</code></pre>
+
+<h3>Log handler</h3>
+<pre><span class="lang-label">typescript</span><code><span class="kw">const</span> engine = <span class="kw">await</span> <span class="fn">createEngine</span>({
+  telemetry: {
+    logHandler: (entry) => {
+      console.<span class="fn">log</span>(<span class="str">`[${entry.severityText}] ${entry.body}`</span>, entry.attributes);
+    },
+  },
+});</code></pre>
+
+<!-- ============================================================ -->
+<!-- DASHBOARD -->
+<!-- ============================================================ -->
+<h2 id="dashboard">Dashboard</h2>
+
+<p>The HTTP server includes a built-in monitoring dashboard at <code>/v1/dashboard</code>:</p>
+<ul>
+<li><strong>Execution feed</strong> &mdash; real-time SSE-driven cards showing state transitions</li>
+<li><strong>Execution detail</strong> &mdash; click any card for state timeline, cost breakdown, evaluation scores</li>
+<li><strong>Adapter status</strong> &mdash; connection state, tool count, health check timestamps</li>
+<li><strong>Provider health</strong> &mdash; circuit breaker states, priority, per-provider metrics</li>
+<li><strong>Cost summary</strong> &mdash; total spend with breakdowns by flow, user, and provider</li>
+<li><strong>Discernment panel</strong> &mdash; business objectives, latest cycle report, active recommendations</li>
+</ul>
+
+<p>The dashboard is a single self-contained HTML page with embedded CSS and JavaScript &mdash; no React, no bundler, no new dependencies. Panels gracefully hide when subsystems are disabled.</p>
+
+<!-- ============================================================ -->
+<!-- CONFIGURATION REFERENCE -->
+<!-- ============================================================ -->
+<h2 id="configuration-reference">Configuration Reference</h2>
+
+<p>Complete <code>runcor.yaml</code> schema:</p>
+<pre><span class="lang-label">yaml</span><code><span class="cm"># Engine settings</span>
+<span class="kw">engine</span>:
+  <span class="kw">concurrency</span>: <span class="nu">100</span>              <span class="cm"># max concurrent executions</span>
+  <span class="kw">drainTimeout</span>: <span class="nu">10000</span>           <span class="cm"># shutdown drain time (ms)</span>
+  <span class="kw">retentionPeriod</span>: <span class="nu">3600</span>         <span class="cm"># keep terminal executions (seconds)</span>
+
+<span class="cm"># Model providers</span>
+<span class="kw">providers</span>:
+  - <span class="kw">type</span>: <span class="str">anthropic</span>             <span class="cm"># anthropic | openai | google | mock</span>
+    <span class="kw">apiKey</span>: <span class="str">${ANTHROPIC_API_KEY}</span>
+    <span class="kw">baseUrl</span>: <span class="str">https://api.anthropic.com</span>  <span class="cm"># optional override</span>
+    <span class="kw">priority</span>: <span class="nu">1</span>                 <span class="cm"># lower = higher priority</span>
+    <span class="kw">models</span>: [<span class="str">claude-sonnet-4-20250514</span>]
+    <span class="kw">costPerToken</span>:
+      <span class="kw">input</span>: <span class="nu">0.003</span>
+      <span class="kw">output</span>: <span class="nu">0.015</span>
+
+<span class="cm"># Routing strategy</span>
+<span class="kw">routing</span>:
+  <span class="kw">strategy</span>: <span class="str">priority</span>            <span class="cm"># priority | round-robin | lowest-cost</span>
+  <span class="kw">maxFallbackAttempts</span>: <span class="nu">2</span>
+  <span class="kw">failureThreshold</span>: <span class="nu">5</span>           <span class="cm"># circuit breaker threshold</span>
+  <span class="kw">cooldownMs</span>: <span class="nu">30000</span>             <span class="cm"># circuit breaker cooldown</span>
+
+<span class="cm"># External connections (MCP adapters)</span>
+<span class="kw">connections</span>:
+  - <span class="kw">name</span>: <span class="str">gmail</span>
+    <span class="kw">preset</span>: <span class="str">gmail</span>               <span class="cm"># gmail | slack | calendar</span>
+    <span class="kw">url</span>: <span class="str">${GMAIL_MCP_URL}</span>
+  - <span class="kw">name</span>: <span class="str">custom-api</span>
+    <span class="kw">transport</span>: <span class="str">sse</span>              <span class="cm"># stdio | sse</span>
+    <span class="kw">url</span>: <span class="str">https://api.example.com/mcp</span>
+    <span class="kw">headers</span>:
+      <span class="kw">Authorization</span>: <span class="str">"Bearer ${API_TOKEN}"</span>
+
+<span class="cm"># Cost tracking</span>
+<span class="kw">costs</span>:
+  <span class="kw">warningThreshold</span>: <span class="nu">0.8</span>
+  <span class="kw">defaultTokenEstimate</span>: <span class="nu">1000</span>
+  <span class="kw">maxLedgerEntries</span>: <span class="nu">100000</span>
+  <span class="kw">budgets</span>:
+    <span class="kw">perRequest</span>:
+      <span class="kw">limit</span>: <span class="nu">0.50</span>
+      <span class="kw">enforcement</span>: <span class="str">hard</span>         <span class="cm"># hard | soft | disabled</span>
+    <span class="kw">perUser</span>:
+      <span class="kw">limit</span>: <span class="nu">10.00</span>
+      <span class="kw">enforcement</span>: <span class="str">hard</span>
+      <span class="kw">window</span>:
+        <span class="kw">type</span>: <span class="str">daily</span>             <span class="cm"># hourly | daily | monthly | custom | none</span>
+    <span class="kw">perFlow</span>:
+      <span class="kw">limit</span>: <span class="nu">50.00</span>
+      <span class="kw">enforcement</span>: <span class="str">soft</span>
+    <span class="kw">global</span>:
+      <span class="kw">limit</span>: <span class="nu">1000.00</span>
+      <span class="kw">enforcement</span>: <span class="str">hard</span>
+
+<span class="cm"># Telemetry</span>
+<span class="kw">telemetry</span>:
+  <span class="kw">serviceName</span>: <span class="str">my-app</span>
+  <span class="kw">serviceVersion</span>: <span class="str">1.0.0</span>
+  <span class="kw">memorySpans</span>: <span class="kw">false</span>
+
+<span class="cm"># Policy engine</span>
+<span class="kw">policy</span>:
+  <span class="kw">rateLimits</span>:
+    - <span class="kw">name</span>: <span class="str">per-user</span>
+      <span class="kw">scope</span>: <span class="str">user</span>               <span class="cm"># user | flow | global</span>
+      <span class="kw">limit</span>: <span class="nu">100</span>
+      <span class="kw">windowMs</span>: <span class="nu">3600000</span>
+      <span class="kw">behavior</span>: <span class="str">reject</span>          <span class="cm"># reject | queue</span>
+  <span class="kw">accessPolicies</span>:
+    - <span class="kw">identity</span>: <span class="str">"*"</span>
+      <span class="kw">allowedOperations</span>: [<span class="str">trigger</span>, <span class="str">resume</span>]
+  <span class="kw">tenants</span>:
+    - <span class="kw">tenantId</span>: <span class="str">customer-a</span>
+      <span class="kw">allowedFlows</span>: [<span class="str">customer-a-flow</span>]
+
+<span class="cm"># Evaluation</span>
+<span class="kw">evaluation</span>:
+  <span class="kw">evaluators</span>:
+    - <span class="kw">type</span>: <span class="str">length</span>
+      <span class="kw">config</span>:
+        <span class="kw">minLength</span>: <span class="nu">50</span>
+        <span class="kw">maxLength</span>: <span class="nu">2000</span>
+  <span class="kw">autoFlagScoreThreshold</span>: <span class="nu">0.3</span>
+
+<span class="cm"># MCP server</span>
+<span class="kw">server</span>:
+  <span class="kw">enabled</span>: <span class="kw">true</span>
+  <span class="kw">name</span>: <span class="str">my-app</span>
+  <span class="kw">version</span>: <span class="str">1.0.0</span>
+
+<span class="cm"># HTTP server</span>
+<span class="kw">httpServer</span>:
+  <span class="kw">enabled</span>: <span class="kw">true</span>
+  <span class="kw">port</span>: <span class="nu">3000</span>
+  <span class="kw">hostname</span>: <span class="str">127.0.0.1</span>
+
+<span class="cm"># Scheduler</span>
+<span class="kw">scheduler</span>:
+  <span class="kw">defaultTimezone</span>: <span class="str">America/New_York</span>
+  <span class="kw">flows</span>:
+    <span class="kw">daily-report</span>:
+      <span class="kw">cron</span>: <span class="str">"0 8 * * *"</span>
+      <span class="kw">timezone</span>: <span class="str">America/New_York</span>
+
+<span class="cm"># State persistence</span>
+<span class="kw">state</span>:
+  <span class="kw">type</span>: <span class="str">sqlite</span>                  <span class="cm"># memory | sqlite</span>
+  <span class="kw">path</span>: <span class="str">./data/runcor.db</span>
+
+<span class="cm"># Discernment (business value analysis)</span>
+<span class="kw">discernment</span>:
+  <span class="kw">enabled</span>: <span class="kw">true</span>
+  <span class="kw">autonomy</span>: <span class="str">recommend</span>           <span class="cm"># observe | recommend | advise | enforce</span>
+  <span class="kw">schedule</span>: <span class="str">daily</span>
+  <span class="kw">lookbackPeriod</span>: <span class="nu">604800</span>        <span class="cm"># 7 days (seconds)</span>
+  <span class="kw">gracePeriod</span>: <span class="nu">86400</span>            <span class="cm"># 24 hours (seconds)</span>
+
+<span class="cm"># Business objectives</span>
+<span class="kw">objectives</span>:
+  - <span class="kw">name</span>: <span class="str">customer-support</span>
+    <span class="kw">description</span>: <span class="str">"Reduce support ticket volume"</span>
+  - <span class="kw">name</span>: <span class="str">operational-visibility</span>
+    <span class="kw">description</span>: <span class="str">"Daily business metric visibility"</span></code></pre>
+
+<h3>Environment variable interpolation</h3>
+<pre><span class="lang-label">yaml</span><code><span class="kw">apiKey</span>: <span class="str">${ANTHROPIC_API_KEY}</span>              <span class="cm"># required — throws if not set</span>
+<span class="kw">baseUrl</span>: <span class="str">${BASE_URL:-https://default.com}</span> <span class="cm"># optional — uses default value</span></code></pre>
+
+<!-- ============================================================ -->
+<!-- ERROR HANDLING -->
+<!-- ============================================================ -->
+<h2 id="error-handling">Error Handling</h2>
+
+<p>All engine errors throw <code>EngineError</code> with a <code>code</code> property:</p>
+<pre><span class="lang-label">typescript</span><code><span class="kw">import</span> { EngineError } <span class="kw">from</span> <span class="str">'runcor'</span>;
+
+<span class="kw">try</span> {
+  <span class="kw">await</span> engine.<span class="fn">trigger</span>(<span class="str">'unknown-flow'</span>, { idempotencyKey: <span class="str">'key'</span> });
+} <span class="kw">catch</span> (err) {
+  <span class="kw">if</span> (err <span class="kw">instanceof</span> EngineError) {
+    console.<span class="fn">log</span>(err.code);    <span class="cm">// 'FLOW_NOT_FOUND'</span>
+    console.<span class="fn">log</span>(err.message); <span class="cm">// 'Flow "unknown-flow" not found'</span>
+  }
+}</code></pre>
+
+<h3>Error codes</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Code</th><th>When</th></tr></thead>
+<tbody>
+<tr><td><code>ENGINE_NOT_READY</code></td><td>Engine not initialized or already stopped</td></tr>
+<tr><td><code>ENGINE_SHUTTING_DOWN</code></td><td>Operation attempted during shutdown</td></tr>
+<tr><td><code>FLOW_NOT_FOUND</code></td><td>Trigger/unregister with unknown flow name</td></tr>
+<tr><td><code>DUPLICATE_FLOW</code></td><td>Registering a flow name that already exists</td></tr>
+<tr><td><code>EXECUTION_NOT_FOUND</code></td><td>Get/resume/cancel/replay with unknown ID</td></tr>
+<tr><td><code>INVALID_STATE</code></td><td>Resume non-waiting or cancel completed execution</td></tr>
+<tr><td><code>MISSING_IDEMPOTENCY_KEY</code></td><td>Trigger without idempotencyKey</td></tr>
+<tr><td><code>POLICY_DENIED</code></td><td>Policy rule blocked the operation</td></tr>
+<tr><td><code>RATE_LIMITED</code></td><td>Rate limit exceeded</td></tr>
+<tr><td><code>BUDGET_EXCEEDED</code></td><td>Hard budget limit hit</td></tr>
+<tr><td><code>VALIDATION_FAILED</code></td><td>Structured output failed schema validation</td></tr>
+<tr><td><code>CONFIG_INVALID</code></td><td>Invalid runcor.yaml</td></tr>
+<tr><td><code>CONFIG_NOT_FOUND</code></td><td>runcor.yaml not found</td></tr>
+<tr><td><code>INVALID_SCHEDULE</code></td><td>Bad cron expression</td></tr>
+<tr><td><code>ADAPTER_NOT_FOUND</code></td><td>Unknown adapter name</td></tr>
+<tr><td><code>ADAPTER_NOT_CONNECTED</code></td><td>Adapter not in connected state</td></tr>
+<tr><td><code>TOOL_NOT_FOUND</code></td><td>Unknown tool qualified name</td></tr>
+</tbody>
+</table></div>
+
+<h3>Specialized errors</h3>
+<pre><span class="lang-label">typescript</span><code><span class="kw">import</span> { BudgetExceededError, ValidationError, AllProvidersFailedError } <span class="kw">from</span> <span class="str">'runcor'</span>;
+
+<span class="cm">// BudgetExceededError — thrown when hard budget is exceeded</span>
+<span class="cm">// ValidationError — thrown when structured output fails schema</span>
+<span class="cm">// AllProvidersFailedError — thrown when all fallback providers fail</span>
+<span class="cm">// RetryableError — thrown by providers for transient failures (auto-retried)</span></code></pre>
+
+<!-- ============================================================ -->
+<!-- TESTING WITH MOCKPROVIDER -->
+<!-- ============================================================ -->
+<h2 id="testing-with-mockprovider">Testing with MockProvider</h2>
+
+<p>The <code>MockProvider</code> lets you test flows without real API keys:</p>
+<pre><span class="lang-label">typescript</span><code><span class="kw">import</span> { createEngine, MockProvider } <span class="kw">from</span> <span class="str">'runcor'</span>;
+
+<span class="cm">// Simple mock — returns a template string</span>
+<span class="kw">const</span> engine = <span class="kw">await</span> <span class="fn">createEngine</span>({
+  model: { provider: <span class="kw">new</span> <span class="fn">MockProvider</span>(<span class="str">'This is a mock response.'</span>) },
+});
+
+<span class="cm">// Queue multiple responses</span>
+<span class="kw">const</span> mock = <span class="kw">new</span> <span class="fn">MockProvider</span>();
+mock.<span class="fn">queueResponses</span>([
+  { text: <span class="str">'First response'</span> },
+  { text: <span class="str">'Second response'</span> },
+  { toolCalls: [{ id: <span class="str">'tc-1'</span>, name: <span class="str">'search'</span>, arguments: { q: <span class="str">'test'</span> } }] },
+]);
+
+<span class="cm">// Structured output — MockProvider generates schema-conformant data</span>
+<span class="kw">const</span> response = <span class="kw">await</span> ctx.model.<span class="fn">complete</span>({
+  prompt: <span class="str">'Extract data'</span>,
+  responseFormat: {
+    type: <span class="str">'object'</span>,
+    properties: {
+      name: { type: <span class="str">'string'</span> },
+      age: { type: <span class="str">'integer'</span> },
+    },
+  },
+});
+<span class="cm">// response.parsed = { name: 'mock-string', age: 42 }</span></code></pre>
+
+<!-- ============================================================ -->
+<!-- PROJECT STRUCTURE -->
+<!-- ============================================================ -->
+<h2 id="project-structure">Project Structure</h2>
+
+<pre class="diagram"><code>src/
+├── index.ts                   # Public API exports
+├── engine.ts                  # Core Runcor class
+├── types.ts                   # Shared type definitions
+├── execution.ts               # Execution state machine
+├── execution-context.ts       # ExecutionContext builder
+├── state-store.ts             # InMemoryStateStore
+├── sqlite-state-store.ts      # SQLiteStateStore
+├── wait-signal.ts             # Wait/resume primitives
+├── model/
+│   ├── router.ts              # Model routing engine
+│   ├── strategies.ts          # Priority, round-robin, lowest-cost
+│   ├── anthropic.ts           # Anthropic provider
+│   ├── openai.ts              # OpenAI provider
+│   ├── google.ts              # Google provider
+│   ├── mock.ts                # Mock provider (testing)
+│   └── validation.ts          # JSON Schema validation
+├── memory/
+│   ├── store.ts               # InMemoryStore
+│   └── scoped.ts              # ScopedMemory (tool/user/session)
+├── cost/
+│   ├── tracker.ts             # CostTracker
+│   ├── budget.ts              # Budget enforcement
+│   └── ledger.ts              # InMemoryCostLedger
+├── policy/
+│   └── policy-engine.ts       # Rules, guardrails, rate limits, access
+├── evaluation/
+│   ├── evaluation-engine.ts   # Scoring and human review
+│   └── built-in/              # Length, format, keyword evaluators
+├── adapter/
+│   ├── adapter-manager.ts     # MCP adapter lifecycle
+│   └── reference/             # Gmail, Slack, Calendar presets
+├── agent/
+│   ├── handler.ts             # createAgentHandler()
+│   └── types.ts               # AgentConfig, AgentResult
+├── discernment/
+│   ├── engine.ts              # DiscernmentEngine
+│   ├── collector.ts           # Signal collection
+│   ├── analyzer.ts            # Heuristic analysis
+│   └── objectives.ts          # ObjectiveRegistry
+├── scheduler/
+│   └── cron-scheduler.ts      # Cron-based triggers
+├── config/
+│   ├── loader.ts              # YAML loading
+│   ├── validator.ts           # Schema validation
+│   ├── interpolator.ts        # Env var interpolation
+│   └── mapper.ts              # Config → EngineConfig mapping
+├── http/
+│   ├── server.ts              # Hono HTTP server
+│   ├── sse.ts                 # SSE event manager
+│   ├── dashboard-html.ts      # Dashboard UI
+│   └── routes/                # REST endpoints
+├── server/
+│   └── mcp-server-adapter.ts  # MCP server interface
+├── cli/
+│   ├── index.ts               # CLI dispatcher
+│   └── commands/              # init, dev, trigger, status, resume
+└── telemetry/
+    └── instrumentation.ts     # OpenTelemetry integration</code></pre>
+
+<!-- ============================================================ -->
+<!-- REQUIREMENTS -->
+<!-- ============================================================ -->
+<h2 id="requirements">Requirements</h2>
+
+<ul>
+<li>Node.js 20+</li>
+<li>TypeScript 5.x (recommended)</li>
+</ul>
+
+<!-- ============================================================ -->
+<!-- LICENSE -->
+<!-- ============================================================ -->
+<h2 id="license">License</h2>
+
+<p>MIT</p>
+
+</div>
+</main>
+
+<script>
+// Sidebar toggle (mobile)
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+
+// Close sidebar on link click (mobile)
+document.querySelectorAll('.sidebar a').forEach(a=>{
+  a.addEventListener('click',()=>{
+    if(window.innerWidth<=900){
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('sidebarOverlay').classList.remove('open');
+    }
+  });
+});
+
+// Back to top visibility
+const btt=document.getElementById('btt');
+window.addEventListener('scroll',()=>{
+  btt.classList.toggle('visible',window.scrollY>400);
+},{passive:true});
+
+// Active section highlighting
+const sidebarLinks=document.querySelectorAll('.sidebar a');
+const sections=[];
+sidebarLinks.forEach(link=>{
+  const id=link.getAttribute('href').slice(1);
+  const el=document.getElementById(id);
+  if(el)sections.push({el,link});
+});
+
+function updateActive(){
+  const scrollY=window.scrollY+80;
+  let current=sections[0];
+  for(const s of sections){
+    if(s.el.offsetTop<=scrollY)current=s;
+  }
+  sidebarLinks.forEach(l=>l.classList.remove('active'));
+  if(current)current.link.classList.add('active');
+}
+window.addEventListener('scroll',updateActive,{passive:true});
+updateActive();
+</script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+providers:
+  - type: mock
+banana: true
+pineapple: 42

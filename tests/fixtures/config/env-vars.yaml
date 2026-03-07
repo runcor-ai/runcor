@@ -1,0 +1,3 @@
+providers:
+  - type: mock
+    apiKey: ${TEST_API_KEY}

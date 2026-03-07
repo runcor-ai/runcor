@@ -1,0 +1,22 @@
+node_modules/
+dist/
+*.js
+!vitest.config.ts
+!bin/runcor.js
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+coverage/
+
+# Development tooling
+.specify/
+.claude/
+specs/
+CLAUDE.md
+open-claude.bat
+.mailmap
