@@ -345,5 +345,6 @@ MIT — see [LICENSE](LICENSE) for details.
   <a href="https://runcor.ai">runcor.ai</a> ·
   <a href="https://github.com/runcor-ai/runcor">GitHub</a> ·
   <a href="https://www.npmjs.com/package/runcor">npm</a> ·
+  <a href="https://discord.gg/dyzHxEyg">Discord</a> ·
   <a href="mailto:hello@runcor.ai">hello@runcor.ai</a>
 </p>
