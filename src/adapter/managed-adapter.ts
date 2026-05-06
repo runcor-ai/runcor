@@ -176,15 +176,24 @@ export class ManagedAdapter {
   }
 
   private async performConnect(): Promise<void> {
-    if (!this.clientFactory) {
+    // For in-process transport, fall back to the built-in client factory if none was injected.
+    // This makes `engine.addAdapter({ transport: 'in-process', tools: [...] })` work without
+    // the consumer needing to configure an AdapterFactory at engine-construction time
+    // (V2-002 fix-up — the original v0.3.0 in-process transport required consumers to inject
+    // `createInProcessClientFactory()` themselves, which is awkward when only the engine
+    // knows when the in-process factory should be used).
+    let factory = this.clientFactory;
+    if (!factory && this.config.transport === 'in-process') {
+      const { createInProcessClientFactory } = await import('./in-process.js');
+      factory = createInProcessClientFactory();
+    }
+    if (!factory) {
       throw new Error(
-        'No MCP client factory configured. Provide a clientFactory in ManagedAdapterOptions.',
+        `No MCP client factory configured for transport "${this.config.transport}". Provide a clientFactory in ManagedAdapterOptions or use transport "in-process".`,
       );
     }
 
-    const { client, transport } = await this.clientFactory.createClient(
-      this.config,
-    );
+    const { client, transport } = await factory.createClient(this.config);
     this.client = client;
     this.transport = transport;
 
