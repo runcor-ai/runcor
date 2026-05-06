@@ -1,7 +1,7 @@
 {
   "name": "runcor",
-  "version": "0.2.0",
-  "description": "The AI Runtime Engine. v0.2.0 adds intra-provider bounded retry on transient errors (FR-017).",
+  "version": "0.3.0",
+  "description": "The AI Runtime Engine. v0.3.0 adds in-process MCP adapter transport (V2-002 FR-200). v0.2.0 added intra-provider bounded retry on transient errors (FR-017).",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

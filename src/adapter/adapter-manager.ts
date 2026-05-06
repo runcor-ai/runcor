@@ -84,6 +84,13 @@ export class AdapterManager {
         'INVALID_ADAPTER_CONFIG',
       );
     }
+
+    if (config.transport === 'in-process' && (!config.tools || config.tools.length === 0)) {
+      throw new EngineError(
+        `Adapter "${config.name}": in-process transport requires a non-empty "tools" field.`,
+        'INVALID_ADAPTER_CONFIG',
+      );
+    }
   }
 
   // ── Adapter Lifecycle ──

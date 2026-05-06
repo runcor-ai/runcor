@@ -628,14 +628,40 @@ export interface EvaluationConfig {
 /** Lifecycle states for an adapter connection */
 export type AdapterState = 'disconnected' | 'connecting' | 'connected' | 'error';
 
-/** Transport mechanism for MCP communication */
-export type TransportType = 'stdio' | 'sse';
+/**
+ * Transport mechanism for MCP communication.
+ *
+ * - `stdio` — adapter runs as a subprocess; engine communicates via stdin/stdout MCP protocol.
+ *   Requires `command`. Used for production MCP servers (gmail, slack, calendar references).
+ * - `sse` — adapter runs as a remote HTTP/SSE server; engine connects via URL.
+ *   Requires `url`. Used for cloud-hosted MCP services.
+ * - `in-process` (v0.3.0+) — adapter runs in-process with the engine; tools are dispatched
+ *   directly to handler functions provided in `tools`. Requires `tools`. Used for V2-style
+ *   tool surfaces where spawning a subprocess is undesirable (e.g., a primordial agent's local
+ *   action set, dynamically-synthesised SQLite-schema tools from runcor-integration).
+ */
+export type TransportType = 'stdio' | 'sse' | 'in-process';
+
+/**
+ * Tool definition for in-process adapters (v0.3.0+, V2-002).
+ * Carries the handler function inline; no IPC, no subprocess.
+ */
+export interface AdapterToolDefinition {
+  /** Tool name as exposed to the engine. */
+  name: string;
+  /** Human-readable tool description (passed through to the agent's capability layer). */
+  description: string;
+  /** JSON Schema for the tool's input parameters. */
+  inputSchema: Record<string, unknown>;
+  /** Handler invoked when the engine calls this tool. */
+  handler: (args: Record<string, unknown>) => Promise<ToolCallResult>;
+}
 
 /** Configuration for connecting to an MCP server */
 export interface AdapterConfig {
   /** Unique identifier for this adapter */
   name: string;
-  /** Transport mechanism (stdio or sse) */
+  /** Transport mechanism (stdio, sse, or in-process) */
   transport: TransportType;
   /** Command to launch local MCP server process (required for stdio) */
   command?: string;
@@ -647,6 +673,11 @@ export interface AdapterConfig {
   url?: string;
   /** HTTP headers for SSE transport (e.g., auth tokens) */
   headers?: Record<string, string>;
+  /**
+   * In-process tool definitions (required when `transport === 'in-process'`).
+   * Each tool's `handler` is invoked directly when the engine routes a call to this adapter.
+   */
+  tools?: AdapterToolDefinition[];
   /** Per-operation timeout in milliseconds. Default: 30000 */
   timeoutMs?: number;
   /** Maximum retry attempts for failed operations. Default: 3 */
