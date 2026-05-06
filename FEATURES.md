@@ -26,12 +26,13 @@ await ctx.memory.user.get('preferences');
 
 ### 003 — Model Router
 
-Multi-provider model routing with fallback chains, circuit breakers, and three routing strategies.
+Multi-provider model routing with fallback chains, circuit breakers, intra-provider retry on transient errors, and three routing strategies.
 
 - **Providers**: Anthropic (Claude), OpenAI (GPT), Google (Gemini), Mock (testing)
 - **Strategies**: Priority (ordered failover), Round-Robin (load distribution), Lowest-Cost (budget optimization)
 - **Circuit breaker**: Automatic provider health tracking with open/half-open/closed states
 - **Streaming**: SSE-compatible token streaming across all providers
+- **Intra-provider retry** (v0.2.0): Up to 3 attempts on the SAME provider with exponential backoff (200ms × 2^n) for transient errors (HTTP 429 / HTTP 5xx / network errors: ETIMEDOUT, ECONNRESET, ENOTFOUND, ECONNREFUSED). Non-transient errors (4xx other than 429, auth failures) skip retry. After exhaustion, the existing provider-fallback path takes over. Single-provider deployments now get retry coverage on transient hiccups without changes to the existing fallback semantics.
 
 ### 004 — Cost Tracking
 

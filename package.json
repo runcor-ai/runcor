@@ -1,7 +1,7 @@
 {
   "name": "runcor",
-  "version": "0.1.0",
-  "description": "The AI Runtime Engine",
+  "version": "0.2.0",
+  "description": "The AI Runtime Engine. v0.2.0 adds intra-provider bounded retry on transient errors (FR-017).",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
