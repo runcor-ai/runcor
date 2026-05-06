@@ -216,4 +216,30 @@ describe('AdapterManager validation — in-process transport', () => {
       mgr.addAdapter({ name: 'e', transport: 'sse' }),
     ).rejects.toThrow(/sse transport requires a "url" field/);
   });
+
+  it('default ManagedAdapter constructor (no factory injected) auto-uses in-process factory', async () => {
+    // V2-002 fix-up: when the engine's default AdapterFactory creates a `new ManagedAdapter(config)`
+    // without options, in-process transport SHOULD still work (auto-fallback to built-in factory).
+    // This is the path V2 hits when calling engine.addAdapter({ transport: 'in-process' }) without
+    // configuring a custom AdapterFactory at engine-construction time.
+    const mgr = makeManager(); // default factory: new ManagedAdapter(c) — no options
+
+    await expect(
+      mgr.addAdapter({ name: 'auto-inp', transport: 'in-process', tools: [ECHO_TOOL] }),
+    ).resolves.toBeUndefined();
+
+    const result = await mgr.callTool('auto-inp.echo', { message: 'auto' });
+    expect(result.content[0]).toMatchObject({ text: 'Echo: auto' });
+
+    await mgr.shutdown();
+  });
+
+  it('default ManagedAdapter for non-in-process transport still throws on connect (no factory)', async () => {
+    // Non-in-process transports still require explicit factory injection (auto-fallback only
+    // applies to in-process). This preserves the original v0.3.0 contract for stdio/sse.
+    const mgr = makeManager();
+    await expect(
+      mgr.addAdapter({ name: 's', transport: 'stdio', command: 'node' }),
+    ).rejects.toThrow(/No MCP client factory configured for transport "stdio"/);
+  });
 });
