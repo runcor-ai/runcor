@@ -1,4 +1,12 @@
-// ModelRouter class — multi-provider routing with fallback chains
+// ModelRouter class — multi-provider routing with fallback chains.
+//
+// v2-002 (FR-017): adds intra-provider bounded retry on transient errors. Inside the existing
+// provider-attempt for-loop, transient failures (network errors, HTTP 429, HTTP 5xx) retry the
+// SAME provider up to 3 times with exponential backoff (200ms × 2^n) before recording the
+// circuit-breaker failure and falling through to the next provider. Non-transient errors
+// (4xx other than 429, auth failures, malformed-request) skip retry and immediately record
+// the breaker failure as before. This closes the FR-017 gap where single-provider deployments
+// (V2 with OpenRouter only) had zero retry coverage on transient hiccups.
 
 import type { Span, Context } from '@opentelemetry/api';
 import type { ModelRequest, ModelResponse, ModelStream, StreamEvent } from './provider.js';
@@ -10,6 +18,46 @@ import { resolveStrategy } from './strategies.js';
 import { AllProvidersFailedError, EngineError } from '../errors.js';
 import type { ProviderError } from '../errors.js';
 import type { EngineInstrumentation } from '../telemetry/instrumentation.js';
+
+/** Maximum intra-provider retry attempts on transient errors (v2-002 FR-017). */
+const RETRY_MAX_ATTEMPTS = 3;
+/** Base backoff (ms) for exponential retry: actual delay = base × 2^(attempt-1). */
+const RETRY_BACKOFF_BASE_MS = 200;
+
+/**
+ * Classify an error as transient (worth retrying) vs non-transient (skip retry).
+ *
+ * Transient: network errors (ETIMEDOUT / ECONNRESET / ENOTFOUND / ECONNREFUSED),
+ * HTTP 429 (rate limit), HTTP 5xx (server error). Everything else (4xx other than 429,
+ * auth failures, malformed-request) is treated as non-transient and surfaced immediately.
+ *
+ * Provider implementations may attach `statusCode` / `status` / `code` properties on thrown
+ * errors. This function reads any of those fields defensively — no shape is required.
+ */
+export function isTransient(err: unknown): boolean {
+  if (!(err instanceof Error)) return false;
+  const e = err as Error & { statusCode?: number; status?: number; code?: string };
+  const status = e.statusCode ?? e.status;
+  if (typeof status === 'number') {
+    if (status === 429) return true;
+    if (status >= 500 && status < 600) return true;
+    return false;
+  }
+  if (
+    e.code === 'ETIMEDOUT' ||
+    e.code === 'ECONNRESET' ||
+    e.code === 'ENOTFOUND' ||
+    e.code === 'ECONNREFUSED'
+  ) {
+    return true;
+  }
+  return false;
+}
+
+/** Helper to await a delay (extracted so tests can mock if needed). */
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 export interface ModelRouterOptions {
   providers: ProviderRegistration[];
@@ -144,7 +192,7 @@ export class ModelRouter implements ModelInterface {
         const attemptSpan = this.createAttemptSpan(inst, modelCtx, registration.name, attemptCount);
 
         try {
-          const response = await registration.provider.complete(cleanRequest as ModelRequest);
+          const response = await this.completeWithRetry(registration.provider, cleanRequest as ModelRequest);
           const breaker = this.breakers.get(registration.name);
           breaker?.recordSuccess();
           this._lastResolvedProvider = registration.name;
@@ -187,7 +235,7 @@ export class ModelRouter implements ModelInterface {
         const attemptSpan = this.createAttemptSpan(inst, modelCtx, registration.name, attemptCount);
 
         try {
-          const response = await registration.provider.complete(cleanRequest as ModelRequest);
+          const response = await this.completeWithRetry(registration.provider, cleanRequest as ModelRequest);
           breaker?.recordSuccess();
           this._lastResolvedProvider = registration.name;
           this.endAttemptSuccess(inst, attemptSpan);
@@ -212,6 +260,38 @@ export class ModelRouter implements ModelInterface {
       }
       throw error;
     }
+  }
+
+  /**
+   * Call `provider.complete(request)` with intra-provider bounded retry on transient errors
+   * (v2-002 FR-017). Up to `RETRY_MAX_ATTEMPTS` attempts on the SAME provider with exponential
+   * backoff between retries (`RETRY_BACKOFF_BASE_MS × 2^(attempt-1)`).
+   *
+   * - Transient errors (per `isTransient`): retry with backoff. After exhaustion, the last error
+   *   is rethrown for the outer fallback loop to handle (provider fallback / circuit breaker).
+   * - Non-transient errors: rethrown immediately on the first occurrence (no retry, no delay).
+   *
+   * Internal helper — not part of the public ModelInterface.
+   */
+  private async completeWithRetry(
+    provider: ProviderRegistration['provider'],
+    request: ModelRequest,
+  ): Promise<ModelResponse> {
+    let lastError: unknown;
+    for (let attempt = 1; attempt <= RETRY_MAX_ATTEMPTS; attempt++) {
+      try {
+        return await provider.complete(request);
+      } catch (err) {
+        lastError = err;
+        if (!isTransient(err) || attempt === RETRY_MAX_ATTEMPTS) {
+          throw err;
+        }
+        // Exponential backoff before the next attempt: 200ms, 400ms, 800ms, ...
+        await sleep(RETRY_BACKOFF_BASE_MS * Math.pow(2, attempt - 1));
+      }
+    }
+    // Unreachable — the loop above either returns on success or throws on the last attempt.
+    throw lastError;
   }
 
   /** Create provider attempt span if instrumentation available */
