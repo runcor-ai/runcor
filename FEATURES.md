@@ -24,6 +24,17 @@ await ctx.memory.tool.set('key', value);
 await ctx.memory.user.get('preferences');
 ```
 
+### 010 — In-Process Adapter Transport (v0.3.0)
+
+A third MCP transport variant alongside `stdio` and `sse`. In-process adapters live in the same Node process as the engine; tools are dispatched directly to handler functions inline — no subprocess, no network. Used for V2-style tool surfaces (e.g., a primordial agent's local action set, dynamically-synthesised SQLite-schema tools) where spawning a subprocess is undesirable.
+
+- **Transport variant**: `transport: 'in-process'` on `AdapterConfig`
+- **Required field**: `tools: AdapterToolDefinition[]` — each tool carries `{ name, description, inputSchema, handler }`
+- **Validation**: enforced in `AdapterManager.addAdapter` — non-empty tools array required
+- **Client factory**: `createInProcessClientFactory()` exported from runcor; consumers compose it with their stdio/sse factories in their `AdapterFactory`
+- **No transport, no IPC**: `client.close` and `transport.close` are no-ops; in-process adapters are always "available" while the process is running
+- **Resources**: not supported in v0.3.0; `readResource` throws `NOT_IMPLEMENTED`
+
 ### 003 — Model Router
 
 Multi-provider model routing with fallback chains, circuit breakers, intra-provider retry on transient errors, and three routing strategies.

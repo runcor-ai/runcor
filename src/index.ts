@@ -154,6 +154,7 @@ export type {
   TransportType,
   AdapterToolSchema,
   AdapterResourceSchema,
+  AdapterToolDefinition,
   ToolCallResult,
   ToolContent,
   ResourceContent,
@@ -166,6 +167,9 @@ export type {
 export { gmailAdapterConfig, gmailToolSchemas } from './adapter/reference/gmail.js';
 export { slackAdapterConfig, slackToolSchemas } from './adapter/reference/slack.js';
 export { calendarAdapterConfig, calendarToolSchemas } from './adapter/reference/calendar.js';
+
+// In-process adapter (V2-002, v0.3.0)
+export { createInProcessClientFactory } from './adapter/in-process.js';
 
 // MCP Server types
 export type { MCPServerConfig } from './server/types.js';
